@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "name": "pexo-bltcy-proxy",
+  "builds": [
+    { "src": "api/generate.js", "use": "@vercel/node" },
+    { "src": "api/status.js", "use": "@vercel/node" },
+    { "src": "web-ui/index.html", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/generate", "dest": "/api/generate.js" },
+    { "src": "/api/status", "dest": "/api/status.js" },
+    { "src": "/", "dest": "/web-ui/index.html" },
+    { "src": "/(.*)", "dest": "/web-ui/index.html" }
+  ]
+}

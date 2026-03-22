@@ -1,0 +1,39 @@
+{
+  "name": "video-creator",
+  "description": "AI 图像和视频生成专家，使用 bltcy.ai 的 Flux、Kling、Wan 等模型",
+  "skills": [
+    {
+      "id": "videoagent-video-studio-bltcy",
+      "path": "~/.openclaw/skills/videoagent-video-studio-bltcy"
+    }
+  ],
+  "env": {
+    "VIDEO_STUDIO_PROXY_URL": "https://proxy-roan-eight.vercel.app"
+  },
+  "capabilities": [
+    "text-to-image",
+    "text-to-video",
+    "image-to-video",
+    "reference-to-video"
+  ],
+  "models": {
+    "image": {
+      "flux": {"price": "¥0.01", "description": "最便宜，质量优秀"},
+      "grok-4.1-image": {"price": "¥0.1", "description": "Grok 图像模型"},
+      "seedream-3.0": {"price": "¥0.1", "description": "即梦，中文好"}
+    },
+    "video": {
+      "kling-v2-6": {"price": "¥2.5", "description": "最高质量"},
+      "kling-video-o1": {"price": "¥0.8", "description": "性价比"},
+      "runway-gen4-turbo": {"price": "¥0.8", "description": "运动控制"},
+      "wan2.2-flash": {"price": "¥0.8", "description": "阿里万相"}
+    }
+  },
+  "workspace": "~/.openclaw/agents/video-creator/workspace",
+  "model": "gpt-agent-3/kimi-for-coding",
+  "discord": {
+    "enabled": true,
+    "requireMention": true,
+    "channels": ["all"]
+  }
+}
