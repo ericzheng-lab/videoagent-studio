@@ -46,7 +46,11 @@ async function uploadToOSS(base64Data, filename) {
   const date = new Date();
   const datePrefix = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}`;
   const uniqueId = Math.random().toString(36).substring(2, 10);
-  const objectName = `videoagent-images/${datePrefix}/${uniqueId}_${filename}`;
+  
+  // 根据文件名前缀判断存储路径
+  const isMJ = filename.startsWith('mj-');
+  const folderPrefix = isMJ ? 'mj-images' : 'videoagent-images';
+  const objectName = `${folderPrefix}/${datePrefix}/${uniqueId}_${filename}`;
   
   console.log(`[OSS] Uploading ${filename} (${buffer.length} bytes)...`);
   

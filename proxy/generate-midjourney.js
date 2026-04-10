@@ -3,7 +3,7 @@
  * 支持 imagine, upscale, variation, blend, describe 等
  */
 
-const MJ_BASE_URL = "https://api.bltcy.ai/mj-fast";
+const MJ_BASE_URL = "https://api.bltcy.ai/mj-relax";
 
 // MJ 模式映射
 const MJ_MODES = {
@@ -19,14 +19,16 @@ const MJ_RELAY = {
   "proxy": "-proxy",      // 自定义代理
 };
 
+const { uploadImage } = require('./image-upload');
+
 /**
- * MJ Imagine - 文生图
+ * MJ Imagine - 文生图 (Relax 模式)
  */
 async function mjImagine(params, apiKey) {
   const {
     prompt,
     aspect = "1:1",  // 1:1, 16:9, 9:16, 4:3, etc.
-    mode = "fast",
+    mode = "relax",  // 默认 relax 模式
     relay = "relay",
     noWait = false,
   } = params;
@@ -66,6 +68,35 @@ async function mjImagine(params, apiKey) {
 
   // 等待完成
   const result = await waitForMJTask(taskId, apiKey, relay);
+  
+  // 上传到 OSS
+  if (result.success && result.imageUrl) {
+    try {
+      console.log('[MJ] Downloading image from Discord...');
+      const imageResponse = await fetch(result.imageUrl);
+      const imageBuffer = await imageResponse.arrayBuffer();
+      const base64Data = Buffer.from(imageBuffer).toString('base64');
+      
+      console.log('[MJ] Uploading to OSS...');
+      const ossUrl = await uploadImage(base64Data, `mj-${Date.now()}.png`);
+      
+      return {
+        ...result,
+        imageUrl: ossUrl,
+        originalUrl: result.imageUrl,
+        price: "¥1.00",
+      };
+    } catch (e) {
+      console.error('[MJ] OSS upload failed:', e.message);
+      // OSS 失败，返回原始 Discord 链接
+      return {
+        ...result,
+        price: "¥1.00",
+        warning: "OSS upload failed, returning temporary Discord link",
+      };
+    }
+  }
+  
   return result;
 }
 
