@@ -616,9 +616,9 @@
                 if (label === 'REROLL') {
                     payload = { mode: 'mj-imagine', prompt: mjStudioState.prompt, aspect: mjStudioState.aspect, noWait: true };
                 } else if (label.startsWith('U')) {
-                    payload = { mode: 'mj-upscale', taskId: mjStudioState.taskId, button: label };
+                    payload = { mode: 'mj-upscale', taskId: mjStudioState.taskId, button: label, buttons: mjStudioState.buttons };
                 } else {
-                    payload = { mode: 'mj-variation', taskId: mjStudioState.taskId, button: label };
+                    payload = { mode: 'mj-variation', taskId: mjStudioState.taskId, button: label, buttons: mjStudioState.buttons };
                 }
                 const res = await fetch(`${API_BASE}/api/generate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 const data = await res.json();
@@ -802,13 +802,15 @@
                     payload = {
                         mode: 'mj-upscale',
                         taskId: currentMJ.taskId,
-                        button: label
+                        button: label,
+                        buttons: currentMJ.buttons
                     };
                 } else {
                     payload = {
                         mode: 'mj-variation',
                         taskId: currentMJ.taskId,
-                        button: label
+                        button: label,
+                        buttons: currentMJ.buttons
                     };
                 }
 

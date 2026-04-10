@@ -92,13 +92,28 @@ async function mjUpscale(params, apiKey) {
   const {
     taskId,
     button,  // U1, U2, U3, U4
+    buttons, // 从 checkMJStatus 返回的 buttons 数组
   } = params;
 
   const endpoint = `${MJ_BASE_URL}/mj/submit/action`;
 
-  const customId = `MJ::JOB::upsample::${button.replace('U', '')}::${taskId}`;
+  // 从 buttons 数组中找到对应的 customId
+  let customId;
+  if (buttons && Array.isArray(buttons)) {
+    const btn = buttons.find(b => b.label === button);
+    if (btn && btn.customId) {
+      customId = btn.customId;
+    }
+  }
+  
+  // 如果没找到，使用备用格式
+  if (!customId) {
+    customId = `MJ::JOB::upsample::${button.replace('U', '')}::${taskId}`;
+  }
 
   const body = {
+    taskId: taskId,
+    customId: customId,
     task_id: taskId,
     custom_id: customId,
   };
@@ -133,13 +148,28 @@ async function mjVariation(params, apiKey) {
   const {
     taskId,
     button,  // V1, V2, V3, V4
+    buttons, // 从 checkMJStatus 返回的 buttons 数组
   } = params;
 
   const endpoint = `${MJ_BASE_URL}/mj/submit/action`;
 
-  const customId = `MJ::JOB::variation::${button.replace('V', '')}::${taskId}`;
+  // 从 buttons 数组中找到对应的 customId
+  let customId;
+  if (buttons && Array.isArray(buttons)) {
+    const btn = buttons.find(b => b.label === button);
+    if (btn && btn.customId) {
+      customId = btn.customId;
+    }
+  }
+  
+  // 如果没找到，使用备用格式
+  if (!customId) {
+    customId = `MJ::JOB::variation::${button.replace('V', '')}::${taskId}`;
+  }
 
   const body = {
+    taskId: taskId,
+    customId: customId,
     task_id: taskId,
     custom_id: customId,
   };
