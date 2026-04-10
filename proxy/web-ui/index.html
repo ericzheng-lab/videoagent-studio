@@ -502,7 +502,9 @@
             taskId: null,
             buttons: [],
             prompt: null,
-            aspect: "1:1"
+            aspect: "1:1",
+            imageUrl: null,
+            originalUrl: null
         };
         
         function switchTab(tab, btn) {
@@ -527,7 +529,7 @@
             document.getElementById('edit-prompt').focus();
         }
         
-        let mjStudioState = { taskId: null, buttons: [], prompt: null, aspect: "1:1", imageUrl: null };
+        let mjStudioState = { taskId: null, buttons: [], prompt: null, aspect: "1:1", imageUrl: null, originalUrl: null };
         
         async function generateMJStudioImage() {
             const prompt = document.getElementById('mjstudio-prompt').value;
@@ -552,7 +554,7 @@
                 const data = await response.json();
                 if (!(data.success && data.taskId)) throw new Error(data.error || 'Midjourney 提交失败');
                 
-                mjStudioState = { taskId: data.taskId, buttons: [], prompt, aspect, imageUrl: null, lastAction: 'imagine', lastButton: null };
+                mjStudioState = { taskId: data.taskId, buttons: [], prompt, aspect, imageUrl: null, originalUrl: null, lastAction: 'imagine', lastButton: null };
                 document.getElementById('mjstudio-status').textContent = `⏳ Midjourney 任务已提交：${data.taskId}，每 20 秒检查一次...`;
                 await pollMJStudioStatus(data.taskId);
             } catch (err) {
@@ -576,6 +578,7 @@
                         mjStudioState.taskId = taskId;
                         mjStudioState.buttons = data.buttons || [];
                         mjStudioState.imageUrl = data.imageUrl;
+                        mjStudioState.originalUrl = data.originalUrl || data.imageUrl;
                         renderMJStudioButtons();
                         saveToGallery('image', data.imageUrl, mjStudioState.prompt, 'midjourney');
                     } else if (data.status === 'failure' || data.status === 'failed' || data.error) {
@@ -637,22 +640,22 @@
         }
         
         function sendCurrentMJToEdit() {
-            if (!mjStudioState.imageUrl) { alert('还没有可用的结果图'); return; }
+            if (!mjStudioState.originalUrl) { alert('还没有可用的结果图'); return; }
             const isUpscaledSingle = /upscale|upsample/i.test(mjStudioState.lastAction || '') || /^U[1-4]$/i.test(mjStudioState.lastButton || '');
             if (!isUpscaledSingle) {
                 alert('当前是四宫格总图，不能精确指定其中一张做编辑。请先点击 U1/U2/U3/U4，把目标图放大成单张后，再进入 MJ 编辑。');
                 return;
             }
-            useForMJEdit(mjStudioState.imageUrl);
+            useForMJEdit(mjStudioState.originalUrl);
         }
         function useCurrentMJInEdit(editPrompt) {
-            if (!mjStudioState.imageUrl) { alert('还没有可用的结果图'); return; }
+            if (!mjStudioState.originalUrl) { alert('还没有可用的结果图'); return; }
             const isUpscaledSingle = /upscale|upsample/i.test(mjStudioState.lastAction || '') || /^U[1-4]$/i.test(mjStudioState.lastButton || '');
             if (!isUpscaledSingle) {
                 alert('当前是四宫格总图。请先用 U1-U4 选择并放大你要编辑的那一张，再使用编辑功能。');
                 return;
             }
-            document.getElementById('edit-image-url').value = mjStudioState.imageUrl;
+            document.getElementById('edit-image-url').value = mjStudioState.originalUrl;
             document.getElementById('edit-prompt').value = editPrompt;
             switchTab('edit', document.querySelector('.tab[data-tab="edit"]'));
             document.getElementById('edit-prompt').focus();
@@ -699,7 +702,9 @@
                         taskId: data.taskId,
                         buttons: [],
                         prompt,
-                        aspect: size === '1024x1536' ? '2:3' : size === '1536x1024' ? '3:2' : '1:1'
+                        aspect: size === '1024x1536' ? '2:3' : size === '1536x1024' ? '3:2' : '1:1',
+                        imageUrl: null,
+                        originalUrl: null
                     };
 
                     document.getElementById('image-status').className = 'status pending';
@@ -752,6 +757,8 @@
                         document.getElementById('image-result').classList.add('show');
                         currentMJ.taskId = taskId;
                         currentMJ.buttons = data.buttons || [];
+                        currentMJ.imageUrl = data.imageUrl;
+                        currentMJ.originalUrl = data.originalUrl || data.imageUrl;
                         renderMJButtons();
                         saveToGallery('image', data.imageUrl, currentMJ.prompt, 'midjourney');
                     } else if (data.status === 'failure' || data.status === 'failed' || data.error) {

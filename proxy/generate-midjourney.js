@@ -300,7 +300,8 @@ async function checkMJStatus(taskId, apiKey) {
         status: "completed",
         action: data.action,
         imageUrl: data.imageUrl,
-        buttons: data.buttons,  // U1, U2, U3, U4, V1, V2, V3, V4
+        originalUrl: data.imageUrl, // 保留原始 Midjourney 链接
+        buttons: data.buttons,
         seed: data.seed,
       };
     }
@@ -326,6 +327,7 @@ async function checkMJStatus(taskId, apiKey) {
       status: "completed",
       action: result.action,
       imageUrl: result.imageUrl,
+      originalUrl: result.imageUrl, // 保留原始 Midjourney 链接
       buttons: result.buttons,
       seed: result.seed,
     };
