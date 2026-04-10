@@ -271,8 +271,11 @@ module.exports.statusHandler = async function(req, res) {
     let result;
     
     // Midjourney 状态查询
-    if (type === "mj" || model?.startsWith("mj")) {
+    if (type === "mj" || model?.startsWith("mj") || model === "midjourney") {
       result = await checkMJStatus(taskId, apiKey);
+      if (result && result.success && result.status === "completed") {
+        result.price = "¥1.00";
+      }
     } else {
       // 视频状态查询
       const provider = detectProvider(model) || model;

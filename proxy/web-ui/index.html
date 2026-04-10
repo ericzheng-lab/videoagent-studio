@@ -201,6 +201,28 @@
         .loading.show {
             display: block;
         }
+        .mj-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .mj-btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mj-btn:hover {
+            background: rgba(255,255,255,0.22);
+        }
+        .mj-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
         .spinner {
             width: 50px;
             height: 50px;
@@ -264,6 +286,7 @@
             <div class="result" id="image-result">
                 <div class="status" id="image-status"></div>
                 <img id="image-output" src="" alt="生成的图像">
+                <div class="mj-actions" id="mj-actions" style="display:none;"></div>
             </div>
         </div>
 
@@ -321,6 +344,12 @@
 
     <script>
         const API_BASE = window.location.origin;
+        let currentMJ = {
+            taskId: null,
+            buttons: [],
+            prompt: null,
+            aspect: "1:1"
+        };
         
         function switchTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -346,8 +375,44 @@
             
             document.getElementById('image-loading').classList.add('show');
             document.getElementById('image-result').classList.remove('show');
+            document.getElementById('mj-actions').style.display = 'none';
+            document.getElementById('mj-actions').innerHTML = '';
             
             try {
+                if (model === 'midjourney') {
+                    document.getElementById('image-status').className = 'status pending';
+                    document.getElementById('image-status').textContent = '⏳ Midjourney 提交中（Relax 模式，通常 1-2 分钟）...';
+                    document.getElementById('image-result').classList.add('show');
+
+                    const response = await fetch(`${API_BASE}/api/generate`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            mode: 'mj-imagine',
+                            prompt,
+                            aspect: size === '1024x1536' ? '2:3' : size === '1536x1024' ? '3:2' : '1:1',
+                            noWait: true
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    if (!(data.success && data.taskId)) {
+                        throw new Error(data.error || 'Midjourney 提交失败');
+                    }
+
+                    currentMJ = {
+                        taskId: data.taskId,
+                        buttons: [],
+                        prompt,
+                        aspect: size === '1024x1536' ? '2:3' : size === '1536x1024' ? '3:2' : '1:1'
+                    };
+
+                    document.getElementById('image-status').className = 'status pending';
+                    document.getElementById('image-status').textContent = `⏳ Midjourney 任务已提交：${data.taskId}，每 20 秒检查一次...`;
+                    await pollMJStatus(data.taskId);
+                    return;
+                }
+
                 const response = await fetch(`${API_BASE}/api/generate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -374,6 +439,101 @@
                 document.getElementById('image-status').className = 'status error';
                 document.getElementById('image-status').textContent = '❌ ' + err.message;
                 document.getElementById('image-result').classList.add('show');
+            } finally {
+                document.getElementById('image-loading').classList.remove('show');
+            }
+        }
+
+        async function pollMJStatus(taskId) {
+            const checkStatus = async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/api/status?jobId=${taskId}&model=midjourney&type=mj`);
+                    const data = await response.json();
+
+                    if (data.status === 'completed') {
+                        document.getElementById('image-status').className = 'status success';
+                        document.getElementById('image-status').textContent = `✅ Midjourney 完成！价格: ${data.price || '¥1.00'}`;
+                        document.getElementById('image-output').src = data.imageUrl;
+                        document.getElementById('image-result').classList.add('show');
+                        currentMJ.taskId = taskId;
+                        currentMJ.buttons = data.buttons || [];
+                        renderMJButtons();
+                        saveToGallery('image', data.imageUrl, currentMJ.prompt, 'midjourney');
+                    } else if (data.status === 'failure' || data.status === 'failed' || data.error) {
+                        throw new Error(data.message || data.error || 'Midjourney 生成失败');
+                    } else {
+                        document.getElementById('image-status').className = 'status pending';
+                        document.getElementById('image-status').textContent = `⏳ Midjourney 生成中（任务 ${taskId}），20 秒后继续检查...`;
+                        setTimeout(checkStatus, 20000);
+                    }
+                } catch (err) {
+                    document.getElementById('image-status').className = 'status error';
+                    document.getElementById('image-status').textContent = '❌ ' + err.message;
+                    document.getElementById('image-result').classList.add('show');
+                }
+            };
+            checkStatus();
+        }
+
+        function renderMJButtons() {
+            const container = document.getElementById('mj-actions');
+            const labels = ['U1','U2','U3','U4','V1','V2','V3','V4','REROLL'];
+            container.innerHTML = labels.map(label =>
+                `<button class="mj-btn" onclick="handleMJAction('${label}')">${label}</button>`
+            ).join('');
+            container.style.display = 'flex';
+        }
+
+        async function handleMJAction(label) {
+            if (!currentMJ.taskId) {
+                alert('没有可操作的 Midjourney 任务');
+                return;
+            }
+
+            document.getElementById('image-loading').classList.add('show');
+            document.getElementById('image-status').className = 'status pending';
+            document.getElementById('image-status').textContent = `⏳ 正在执行 ${label}...`;
+
+            try {
+                let payload;
+                if (label === 'REROLL') {
+                    payload = {
+                        mode: 'mj-imagine',
+                        prompt: currentMJ.prompt,
+                        aspect: currentMJ.aspect,
+                        noWait: true
+                    };
+                } else if (label.startsWith('U')) {
+                    payload = {
+                        mode: 'mj-upscale',
+                        taskId: currentMJ.taskId,
+                        button: label
+                    };
+                } else {
+                    payload = {
+                        mode: 'mj-variation',
+                        taskId: currentMJ.taskId,
+                        button: label
+                    };
+                }
+
+                const response = await fetch(`${API_BASE}/api/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+
+                if (!(data.success && data.taskId)) {
+                    throw new Error(data.error || `${label} 提交失败`);
+                }
+
+                currentMJ.taskId = data.taskId;
+                currentMJ.buttons = [];
+                await pollMJStatus(data.taskId);
+            } catch (err) {
+                document.getElementById('image-status').className = 'status error';
+                document.getElementById('image-status').textContent = '❌ ' + err.message;
             } finally {
                 document.getElementById('image-loading').classList.remove('show');
             }
