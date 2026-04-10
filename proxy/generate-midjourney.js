@@ -298,6 +298,7 @@ async function checkMJStatus(taskId, apiKey) {
       return {
         success: true,
         status: "completed",
+        action: data.action,
         imageUrl: data.imageUrl,
         buttons: data.buttons,  // U1, U2, U3, U4, V1, V2, V3, V4
         seed: data.seed,
@@ -323,6 +324,7 @@ async function checkMJStatus(taskId, apiKey) {
     return {
       success: true,
       status: "completed",
+      action: result.action,
       imageUrl: result.imageUrl,
       buttons: result.buttons,
       seed: result.seed,

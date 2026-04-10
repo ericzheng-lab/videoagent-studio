@@ -33,6 +33,8 @@ async function mjEdits(params, apiKey) {
     ...(maskBase64 && { maskBase64 }),
   };
 
+  console.log('[MJ Edits] Submitting edit task:', { prompt: body.prompt, image: body.image });
+
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -43,6 +45,7 @@ async function mjEdits(params, apiKey) {
   });
 
   const data = await response.json();
+  console.log('[MJ Edits] API response:', data);
 
   if (data.code !== 1) {
     throw new Error(`MJ Edits failed: ${data.description || JSON.stringify(data)}`);
@@ -61,6 +64,12 @@ async function mjEdits(params, apiKey) {
 
   // 等待完成
   const result = await waitForMJTask(taskId, apiKey);
+  console.log('[MJ Edits] Task result:', result);
+  
+  // 检查 action 字段
+  if (result.action && result.action !== 'EDITS') {
+    console.warn(`[MJ Edits] Warning: Expected action 'EDITS' but got '${result.action}'`);
+  }
   
   // 上传到 OSS
   if (result.success && result.imageUrl) {
