@@ -10,7 +10,7 @@
 
 ### 图像生成 API
 ```bash
-curl -X POST https://proxy-roan-eight.vercel.app/api/generate \
+curl -X POST https://videoagent-studio.vercel.app/api/generate \
   -H "Content-Type: application/json" \
   -d '{
     "mode": "text-to-image",
@@ -23,7 +23,7 @@ curl -X POST https://proxy-roan-eight.vercel.app/api/generate \
 
 ### 视频生成 API
 ```bash
-curl -X POST https://proxy-roan-eight.vercel.app/api/generate \
+curl -X POST https://videoagent-studio.vercel.app/api/generate \
   -H "Content-Type: application/json" \
   -d '{
     "mode": "text-to-video",
@@ -37,7 +37,7 @@ curl -X POST https://proxy-roan-eight.vercel.app/api/generate \
 
 ### 状态查询
 ```bash
-curl "https://proxy-roan-eight.vercel.app/api/status?jobId=xxx&model=kling-o1"
+curl "https://videoagent-studio.vercel.app/api/status?jobId=xxx&model=kling-o1"
 ```
 
 ## 价格速查

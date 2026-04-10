@@ -8,7 +8,7 @@
     }
   ],
   "env": {
-    "VIDEO_STUDIO_PROXY_URL": "https://proxy-roan-eight.vercel.app"
+    "VIDEO_STUDIO_PROXY_URL": "https://videoagent-studio.vercel.app"
   },
   "capabilities": [
     "text-to-image",

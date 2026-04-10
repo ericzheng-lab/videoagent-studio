@@ -2,7 +2,7 @@
 
 ## VideoAgent Studio API
 
-**代理地址**: `https://proxy-roan-eight.vercel.app`
+**代理地址**: `https://videoagent-studio.vercel.app`
 
 ---
 
@@ -10,7 +10,7 @@
 
 ### 快速生成 (Flux - ¥0.01)
 ```bash
-curl -s -X POST https://proxy-roan-eight.vercel.app/api/generate \
+curl -s -X POST https://videoagent-studio.vercel.app/api/generate \
   -H "Content-Type: application/json" \
   -d '{
     "mode": "text-to-image",
@@ -22,7 +22,7 @@ curl -s -X POST https://proxy-roan-eight.vercel.app/api/generate \
 
 ### 带风格生成
 ```bash
-curl -s -X POST https://proxy-roan-eight.vercel.app/api/generate \
+curl -s -X POST https://videoagent-studio.vercel.app/api/generate \
   -H "Content-Type: application/json" \
   -d '{
     "mode": "text-to-image",
@@ -50,7 +50,7 @@ curl -s -X POST https://proxy-roan-eight.vercel.app/api/generate \
 
 ### 文生视频 (推荐 Kling-o1 ¥0.80)
 ```bash
-curl -s -X POST https://proxy-roan-eight.vercel.app/api/generate \
+curl -s -X POST https://videoagent-studio.vercel.app/api/generate \
   -H "Content-Type: application/json" \
   -d '{
     "mode": "text-to-video",
@@ -64,7 +64,7 @@ curl -s -X POST https://proxy-roan-eight.vercel.app/api/generate \
 
 ### 图生视频
 ```bash
-curl -s -X POST https://proxy-roan-eight.vercel.app/api/generate \
+curl -s -X POST https://videoagent-studio.vercel.app/api/generate \
   -H "Content-Type: application/json" \
   -d '{
     "mode": "image-to-video",
@@ -78,7 +78,7 @@ curl -s -X POST https://proxy-roan-eight.vercel.app/api/generate \
 ### 查询状态
 ```bash
 # 替换 xxx 为实际的 jobId
-curl -s "https://proxy-roan-eight.vercel.app/api/status?jobId=xxx&model=kling-o1" | jq
+curl -s "https://videoagent-studio.vercel.app/api/status?jobId=xxx&model=kling-o1" | jq
 ```
 
 ### 可用参数
@@ -98,7 +98,7 @@ curl -s "https://proxy-roan-eight.vercel.app/api/status?jobId=xxx&model=kling-o1
 
 ### 使用参考图生成视频
 ```bash
-curl -s -X POST https://proxy-roan-eight.vercel.app/api/generate \
+curl -s -X POST https://videoagent-studio.vercel.app/api/generate \
   -H "Content-Type: application/json" \
   -d '{
     "mode": "reference-to-video",
@@ -124,7 +124,7 @@ curl -s -X POST https://proxy-roan-eight.vercel.app/api/generate \
 ### 生成多张图像
 ```bash
 for i in {1..3}; do
-  curl -s -X POST https://proxy-roan-eight.vercel.app/api/generate \
+  curl -s -X POST https://videoagent-studio.vercel.app/api/generate \
     -H "Content-Type: application/json" \
     -d "{\"mode\":\"text-to-image\",\"prompt\":\"猫咪 $i\",\"model\":\"flux\",\"seed\":$i}" | jq -r '.images[0].url'
 done
@@ -136,10 +136,10 @@ JOB_ID="xxx"
 MODEL="kling-o1"
 
 while true; do
-  STATUS=$(curl -s "https://proxy-roan-eight.vercel.app/api/status?jobId=$JOB_ID&model=$MODEL" | jq -r '.status')
+  STATUS=$(curl -s "https://videoagent-studio.vercel.app/api/status?jobId=$JOB_ID&model=$MODEL" | jq -r '.status')
   echo "Status: $STATUS"
   if [ "$STATUS" = "completed" ]; then
-    curl -s "https://proxy-roan-eight.vercel.app/api/status?jobId=$JOB_ID&model=$MODEL" | jq -r '.videoUrl'
+    curl -s "https://videoagent-studio.vercel.app/api/status?jobId=$JOB_ID&model=$MODEL" | jq -r '.videoUrl'
     break
   fi
   sleep 5
@@ -150,7 +150,7 @@ done
 
 ## 5. Web UI
 
-可视化界面: https://proxy-roan-eight.vercel.app
+可视化界面: https://videoagent-studio.vercel.app
 
 ---
 

@@ -6,7 +6,7 @@
 **症状**: 调用 API 返回 4xx/5xx 错误
 **解决**:
 1. 检查网络连接
-2. 确认 proxy URL 正确: `https://proxy-roan-eight.vercel.app`
+2. 确认 proxy URL 正确: `https://videoagent-studio.vercel.app`
 3. 检查请求参数格式
 
 ### 视频生成超时
