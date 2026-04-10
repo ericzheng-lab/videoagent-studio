@@ -321,8 +321,8 @@ async function waitForMJTask(taskId, apiKey, maxAttempts = 60) {
       throw new Error("MJ task failed");
     }
 
-    // 等待 5 秒
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    // 等待 20 秒（relax 模式生成慢，不着急）
+    await new Promise(resolve => setTimeout(resolve, 20000));
   }
 
   throw new Error("Timeout waiting for MJ task");
