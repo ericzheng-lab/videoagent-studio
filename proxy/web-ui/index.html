@@ -246,6 +246,7 @@
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('image')">🖼️ 图像生成</button>
+            <button class="tab" onclick="switchTab('edit')">✏️ MJ 编辑</button>
             <button class="tab" onclick="switchTab('video')">🎬 视频生成</button>
             <button class="tab" onclick="switchTab('gallery')">📁 作品库</button>
         </div>
@@ -287,6 +288,45 @@
                 <div class="status" id="image-status"></div>
                 <img id="image-output" src="" alt="生成的图像">
                 <div class="mj-actions" id="mj-actions" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- MJ 编辑面板 -->
+        <div id="edit-panel" class="panel">
+            <div class="form-group">
+                <label>原图 URL</label>
+                <input id="edit-image-url" placeholder="输入要编辑的 Midjourney 图片 URL">
+            </div>
+            <div class="form-group">
+                <label>编辑提示词</label>
+                <textarea id="edit-prompt" placeholder="例如：在右侧加一栋玻璃摩天大楼；扩成 9:16；给天空加夕阳云层..."></textarea>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label>目标比例</label>
+                    <select id="edit-aspect">
+                        <option value="1:1">1:1</option>
+                        <option value="2:3">2:3</option>
+                        <option value="3:2">3:2</option>
+                        <option value="9:16">9:16</option>
+                        <option value="16:9">16:9</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>可选蒙版 Base64</label>
+                    <input id="edit-mask" placeholder="局部编辑时填 maskBase64（可留空）">
+                </div>
+            </div>
+            <button class="generate-btn" onclick="generateMJEdit()">提交 MJ 编辑</button>
+
+            <div class="loading" id="edit-loading">
+                <div class="spinner"></div>
+                <p>正在提交 Midjourney 编辑...</p>
+            </div>
+
+            <div class="result" id="edit-result">
+                <div class="status" id="edit-status"></div>
+                <img id="edit-output" src="" alt="编辑后的图像">
             </div>
         </div>
 
@@ -537,6 +577,81 @@
             } finally {
                 document.getElementById('image-loading').classList.remove('show');
             }
+        }
+
+        async function generateMJEdit() {
+            const imageUrl = document.getElementById('edit-image-url').value;
+            const prompt = document.getElementById('edit-prompt').value;
+            const aspect = document.getElementById('edit-aspect').value;
+            const mask = document.getElementById('edit-mask').value;
+
+            if (!imageUrl || !prompt) {
+                alert('请输入原图 URL 和编辑提示词');
+                return;
+            }
+
+            document.getElementById('edit-loading').classList.add('show');
+            document.getElementById('edit-result').classList.remove('show');
+
+            try {
+                const body = {
+                    mode: 'mj-edits',
+                    prompt,
+                    image: imageUrl,
+                    aspect,
+                    noWait: true
+                };
+                if (mask) body.maskBase64 = mask;
+
+                const response = await fetch(`${API_BASE}/api/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await response.json();
+                if (!(data.success && data.taskId)) {
+                    throw new Error(data.error || 'MJ 编辑提交失败');
+                }
+
+                document.getElementById('edit-status').className = 'status pending';
+                document.getElementById('edit-status').textContent = `⏳ MJ 编辑已提交：${data.taskId}，20秒检查一次...`;
+                document.getElementById('edit-result').classList.add('show');
+
+                await pollMJEditStatus(data.taskId);
+            } catch (err) {
+                document.getElementById('edit-status').className = 'status error';
+                document.getElementById('edit-status').textContent = '❌ ' + err.message;
+                document.getElementById('edit-result').classList.add('show');
+            } finally {
+                document.getElementById('edit-loading').classList.remove('show');
+            }
+        }
+
+        async function pollMJEditStatus(taskId) {
+            const checkStatus = async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/api/status?jobId=${taskId}&model=midjourney&type=mj`);
+                    const data = await response.json();
+
+                    if (data.status === 'completed') {
+                        document.getElementById('edit-status').className = 'status success';
+                        document.getElementById('edit-status').textContent = `✅ MJ 编辑完成！价格: ${data.price || '¥1.00'}`;
+                        document.getElementById('edit-output').src = data.imageUrl;
+                        saveToGallery('image', data.imageUrl, document.getElementById('edit-prompt').value, 'mj-edits');
+                    } else if (data.status === 'failure' || data.status === 'failed' || data.error) {
+                        throw new Error(data.message || data.error || 'MJ 编辑失败');
+                    } else {
+                        document.getElementById('edit-status').className = 'status pending';
+                        document.getElementById('edit-status').textContent = `⏳ MJ 编辑中（任务 ${taskId}），20秒后继续...`;
+                        setTimeout(checkStatus, 20000);
+                    }
+                } catch (err) {
+                    document.getElementById('edit-status').className = 'status error';
+                    document.getElementById('edit-status').textContent = '❌ ' + err.message;
+                }
+            };
+            checkStatus();
         }
         
         async function generateVideo() {

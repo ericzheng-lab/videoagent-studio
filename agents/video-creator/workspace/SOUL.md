@@ -117,6 +117,43 @@ curl -s -X POST ${VIDEO_STUDIO_PROXY_URL}/api/generate \
 **Step 4: 重新生成 (reroll)**
 用户说 "reroll" 或 "重新生成" 时，重新调用 `mj-imagine`。
 
+**Step 5: MJ 编辑 (mj-edits)**
+用户想修改图片（加元素、扩图、改比例、局部重绘）时：
+```bash
+curl -s -X POST ${VIDEO_STUDIO_PROXY_URL}/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "mj-edits",
+    "prompt": "在右侧加一栋玻璃摩天大楼",
+    "image": "https://drs-88.oss-cn-hangzhou.aliyuncs.com/...",
+    "aspect": "9:16"
+  }'
+```
+
+**Step 6: MJ Zoom (mj-zoom)**
+用户想扩大图片范围时：
+```bash
+curl -s -X POST ${VIDEO_STUDIO_PROXY_URL}/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "mj-zoom",
+    "taskId": "上一步的taskId",
+    "button": "ZOOM_1.5"
+  }'
+```
+
+**Step 7: MJ Pan (mj-pan)**
+用户想移动画面焦点时：
+```bash
+curl -s -X POST ${VIDEO_STUDIO_PROXY_URL}/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "mj-pan",
+    "taskId": "上一步的taskId",
+    "direction": "LEFT"
+  }'
+```
+
 ### Reference 视频流程
 1. 获取用户参考图
 2. 确认角色名称和动作需求

@@ -12,6 +12,7 @@ const { generateCheapVideo, checkCheapVideoStatus, CHEAP_VIDEO_MODELS } = requir
 
 // 新功能适配器
 const { mjImagine, mjUpscale, mjVariation, mjBlend, mjDescribe, checkMJStatus } = require("../generate-midjourney");
+const { mjEdits, mjZoom, mjPan, mjVaryRegion } = require("../generate-midjourney-edits");
 const { generateMultiShotVideo, generateSequentialShots } = require("../generate-multishot");
 
 // 工具模块
@@ -84,8 +85,8 @@ module.exports = async function handler(req, res) {
       service: "videoagent-video-studio-proxy",
       version: "3.0.0-bltcy",
       status: "ok",
-      modes: ["text-to-video", "image-to-video", "text-to-image", "reference-to-video", "multi-shot", "mj-imagine", "mj-upscale", "mj-blend"],
-      features: ["reference-mode", "advanced-params", "style-presets", "multi-shot", "midjourney"],
+      modes: ["text-to-video", "image-to-video", "text-to-image", "reference-to-video", "multi-shot", "mj-imagine", "mj-upscale", "mj-blend", "mj-edits", "mj-zoom", "mj-pan", "mj-vary-region"],
+      features: ["reference-mode", "advanced-params", "style-presets", "multi-shot", "midjourney", "midjourney-edits"],
       videoModels: [...Object.keys(KLING_MODELS), ...Object.keys(RUNWAY_MODELS), ...Object.keys(WAN_MODELS)],
       imageModels: [...Object.keys(CHEAP_IMAGE_MODELS), "midjourney"],
       stylePresets: Object.keys(STYLE_PRESETS),
@@ -137,6 +138,20 @@ module.exports = async function handler(req, res) {
       case "multi-shot":
       case "multishot":
         result = await handleMultiShot(body, apiKey);
+        break;
+
+      // Midjourney 编辑功能
+      case "mj-edits":
+        result = await mjEdits(body, apiKey);
+        break;
+      case "mj-zoom":
+        result = await mjZoom(body, apiKey);
+        break;
+      case "mj-pan":
+        result = await mjPan(body, apiKey);
+        break;
+      case "mj-vary-region":
+        result = await mjVaryRegion(body, apiKey);
         break;
 
       // 标准视频生成
