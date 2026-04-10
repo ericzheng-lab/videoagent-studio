@@ -552,7 +552,7 @@
                 const data = await response.json();
                 if (!(data.success && data.taskId)) throw new Error(data.error || 'Midjourney 提交失败');
                 
-                mjStudioState = { taskId: data.taskId, buttons: [], prompt, aspect, imageUrl: null };
+                mjStudioState = { taskId: data.taskId, buttons: [], prompt, aspect, imageUrl: null, lastAction: 'imagine', lastButton: null };
                 document.getElementById('mjstudio-status').textContent = `⏳ Midjourney 任务已提交：${data.taskId}，每 20 秒检查一次...`;
                 await pollMJStudioStatus(data.taskId);
             } catch (err) {
@@ -595,10 +595,14 @@
         
         function renderMJStudioButtons() {
             const container = document.getElementById('mjstudio-actions');
+            const isUpscaledSingle = /upscale|upsample/i.test(mjStudioState.lastAction || '') || /^U[1-4]$/i.test(mjStudioState.lastButton || '');
             const labels = ['U1','U2','U3','U4','V1','V2','V3','V4','REROLL'];
-            container.innerHTML = labels.map(l => `<button class="mj-btn" onclick="handleMJStudioAction('${l}')">${l}</button>`).join('');
+            const helper = isUpscaledSingle
+                ? `<div style="width:100%;margin-bottom:10px;color:#8fd3ff;font-size:0.92rem;">当前结果已是单张图，可以直接带去 MJ 编辑。</div>`
+                : `<div style="width:100%;margin-bottom:10px;color:#ffd166;font-size:0.92rem;">当前是四宫格总图。若要精确编辑某一张，请先点击对应的 U1-U4 放大成单张，再进入 MJ 编辑。</div>`;
+            container.innerHTML = helper + labels.map(l => `<button class="mj-btn" onclick="handleMJStudioAction('${l}')">${l}</button>`).join('');
             container.style.display = 'flex';
-            document.getElementById('mjstudio-edit-actions').style.display = 'flex';
+            document.getElementById('mjstudio-edit-actions').style.display = isUpscaledSingle ? 'flex' : 'none';
         }
         
         async function handleMJStudioAction(label) {
@@ -621,6 +625,8 @@
                 if (!(data.success && data.taskId)) throw new Error(data.error || `${label} 提交失败`);
                 mjStudioState.taskId = data.taskId;
                 mjStudioState.buttons = [];
+                mjStudioState.lastAction = label === 'REROLL' ? 'reroll' : (label.startsWith('U') ? 'upscale' : 'variation');
+                mjStudioState.lastButton = label;
                 await pollMJStudioStatus(data.taskId);
             } catch (err) {
                 document.getElementById('mjstudio-status').className = 'status error';
@@ -632,10 +638,20 @@
         
         function sendCurrentMJToEdit() {
             if (!mjStudioState.imageUrl) { alert('还没有可用的结果图'); return; }
+            const isUpscaledSingle = /upscale|upsample/i.test(mjStudioState.lastAction || '') || /^U[1-4]$/i.test(mjStudioState.lastButton || '');
+            if (!isUpscaledSingle) {
+                alert('当前是四宫格总图，不能精确指定其中一张做编辑。请先点击 U1/U2/U3/U4，把目标图放大成单张后，再进入 MJ 编辑。');
+                return;
+            }
             useForMJEdit(mjStudioState.imageUrl);
         }
         function useCurrentMJInEdit(editPrompt) {
             if (!mjStudioState.imageUrl) { alert('还没有可用的结果图'); return; }
+            const isUpscaledSingle = /upscale|upsample/i.test(mjStudioState.lastAction || '') || /^U[1-4]$/i.test(mjStudioState.lastButton || '');
+            if (!isUpscaledSingle) {
+                alert('当前是四宫格总图。请先用 U1-U4 选择并放大你要编辑的那一张，再使用编辑功能。');
+                return;
+            }
             document.getElementById('edit-image-url').value = mjStudioState.imageUrl;
             document.getElementById('edit-prompt').value = editPrompt;
             switchTab('edit', document.querySelector('.tab[data-tab="edit"]'));
