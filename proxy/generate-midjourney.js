@@ -1,23 +1,10 @@
 /**
  * Midjourney Image Generator Adapter
  * 支持 imagine, upscale, variation, blend, describe 等
+ * 使用 bltcy.ai API - Relax 模式
  */
 
 const MJ_BASE_URL = "https://api.bltcy.ai/mj-relax";
-
-// MJ 模式映射
-const MJ_MODES = {
-  "fast": "mj-fast",
-  "turbo": "mj-turbo", 
-  "relax": "mj-relax",
-};
-
-// 图片代理模式
-const MJ_RELAY = {
-  "relay": "-relay",      // 服务转发 (国内快)
-  "origin": "-origin",    // Discord 原生 (国外快)
-  "proxy": "-proxy",      // 自定义代理
-};
 
 const { uploadImage } = require('./image-upload');
 
@@ -28,12 +15,10 @@ async function mjImagine(params, apiKey) {
   const {
     prompt,
     aspect = "1:1",  // 1:1, 16:9, 9:16, 4:3, etc.
-    mode = "relax",  // 默认 relax 模式
-    relay = "relay",
     noWait = false,
   } = params;
 
-  const endpoint = `${MJ_BASE_URL}${MJ_RELAY[relay] || '-relay'}/mj/submit/imagine`;
+  const endpoint = `${MJ_BASE_URL}/mj/submit/imagine`;
 
   const body = {
     prompt: prompt,
@@ -67,7 +52,7 @@ async function mjImagine(params, apiKey) {
   }
 
   // 等待完成
-  const result = await waitForMJTask(taskId, apiKey, relay);
+  const result = await waitForMJTask(taskId, apiKey);
   
   // 上传到 OSS
   if (result.success && result.imageUrl) {
@@ -107,10 +92,9 @@ async function mjUpscale(params, apiKey) {
   const {
     taskId,
     button,  // U1, U2, U3, U4
-    relay = "relay",
   } = params;
 
-  const endpoint = `${MJ_BASE_URL}${MJ_RELAY[relay] || '-relay'}/mj/submit/action`;
+  const endpoint = `${MJ_BASE_URL}/mj/submit/action`;
 
   const customId = `MJ::JOB::upsample::${button.replace('U', '')}::${taskId}`;
 
@@ -149,10 +133,9 @@ async function mjVariation(params, apiKey) {
   const {
     taskId,
     button,  // V1, V2, V3, V4
-    relay = "relay",
   } = params;
 
-  const endpoint = `${MJ_BASE_URL}${MJ_RELAY[relay] || '-relay'}/mj/submit/action`;
+  const endpoint = `${MJ_BASE_URL}/mj/submit/action`;
 
   const customId = `MJ::JOB::variation::${button.replace('V', '')}::${taskId}`;
 
@@ -191,10 +174,9 @@ async function mjBlend(params, apiKey) {
   const {
     images,  // 图片 URL 数组
     dimensions = "SQUARE",  // SQUARE, PORTRAIT, LANDSCAPE
-    relay = "relay",
   } = params;
 
-  const endpoint = `${MJ_BASE_URL}${MJ_RELAY[relay] || '-relay'}/mj/submit/blend`;
+  const endpoint = `${MJ_BASE_URL}/mj/submit/blend`;
 
   const body = {
     image_urls: Array.isArray(images) ? images : images.split(','),
@@ -230,10 +212,9 @@ async function mjBlend(params, apiKey) {
 async function mjDescribe(params, apiKey) {
   const {
     imageUrl,
-    relay = "relay",
   } = params;
 
-  const endpoint = `${MJ_BASE_URL}${MJ_RELAY[relay] || '-relay'}/mj/submit/describe`;
+  const endpoint = `${MJ_BASE_URL}/mj/submit/describe`;
 
   const body = {
     image_url: imageUrl,
@@ -266,8 +247,8 @@ async function mjDescribe(params, apiKey) {
 /**
  * 查询 MJ 任务状态
  */
-async function checkMJStatus(taskId, apiKey, relay = "relay") {
-  const endpoint = `${MJ_BASE_URL}${MJ_RELAY[relay] || '-relay'}/mj/task/${taskId}/fetch`;
+async function checkMJStatus(taskId, apiKey) {
+  const endpoint = `${MJ_BASE_URL}/mj/task/${taskId}/fetch`;
 
   const response = await fetch(endpoint, {
     headers: {
@@ -304,9 +285,9 @@ async function checkMJStatus(taskId, apiKey, relay = "relay") {
 /**
  * 等待 MJ 任务完成
  */
-async function waitForMJTask(taskId, apiKey, relay = "relay", maxAttempts = 60) {
+async function waitForMJTask(taskId, apiKey, maxAttempts = 60) {
   for (let i = 0; i < maxAttempts; i++) {
-    const result = await checkMJStatus(taskId, apiKey, relay);
+    const result = await checkMJStatus(taskId, apiKey);
     
     if (result.status === "completed") {
       return result;
