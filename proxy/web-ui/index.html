@@ -232,6 +232,43 @@
             animation: spin 1s linear infinite;
             margin: 0 auto 20px;
         }
+        .helper-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 18px;
+        }
+        .helper-card h3 {
+            margin-bottom: 10px;
+            color: #00d4ff;
+            font-size: 1rem;
+        }
+        .helper-card p, .helper-card li {
+            color: #cfcfcf;
+            line-height: 1.6;
+            font-size: 0.92rem;
+        }
+        .helper-card ul {
+            padding-left: 18px;
+        }
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .mini-btn {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            cursor: pointer;
+        }
+        .mini-btn:hover {
+            background: rgba(255,255,255,0.16);
+        }
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
@@ -245,14 +282,91 @@
         </header>
 
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('image')">🖼️ 图像生成</button>
-            <button class="tab" onclick="switchTab('edit')">✏️ MJ 编辑</button>
-            <button class="tab" onclick="switchTab('video')">🎬 视频生成</button>
-            <button class="tab" onclick="switchTab('gallery')">📁 作品库</button>
+            <button class="tab active" data-tab="mjstudio" onclick="switchTab('mjstudio', this)">🎛️ MJ Studio</button>
+            <button class="tab" data-tab="image" onclick="switchTab('image', this)">🖼️ 图像生成</button>
+            <button class="tab" data-tab="edit" onclick="switchTab('edit', this)">✏️ MJ 编辑</button>
+            <button class="tab" data-tab="video" onclick="switchTab('video', this)">🎬 视频生成</button>
+            <button class="tab" data-tab="gallery" onclick="switchTab('gallery', this)">📁 作品库</button>
+        </div>
+
+        <!-- MJ Studio 面板 -->
+        <div id="mjstudio-panel" class="panel active">
+            <div class="helper-card">
+                <h3>Midjourney Studio</h3>
+                <p>这里把 Midjourney 的核心工作流集中在一起：首图生成、U1-U4 放大、V1-V4 变化、Reroll 重抽、以及编辑（加元素 / 扩图 / 改比例）。全部默认走 <strong>Relax</strong> 模式，价格按 <strong>¥1.00</strong> 展示。</p>
+                <div class="quick-actions">
+                    <button class="mini-btn" onclick="fillMJPrompt('cinematic portrait of a young woman, golden hour, film still, ultra detailed')">示例：电影感人像</button>
+                    <button class="mini-btn" onclick="fillMJPrompt('a futuristic city street in heavy rain, neon reflections, dramatic lighting')">示例：赛博城市</button>
+                    <button class="mini-btn" onclick="fillMJEditPrompt('在画面右侧增加更多环境细节，并扩成 9:16 竖构图')">示例：扩图编辑</button>
+                </div>
+            </div>
+
+            <div class="helper-card">
+                <h3>怎么用</h3>
+                <ul>
+                    <li><strong>出图：</strong>在下方输入提示词、比例，点击“生成 Midjourney 图像”。</li>
+                    <li><strong>放大 / 变化：</strong>首图完成后，下方会自动出现 U1-U4 / V1-V4 / REROLL 按钮。</li>
+                    <li><strong>编辑：</strong>可把当前结果图一键带入编辑面板，继续加元素、改比例、扩范围。</li>
+                    <li><strong>作品库联动：</strong>作品库里的图片也可以一键带入 MJ 编辑，无需手动复制 URL。</li>
+                </ul>
+            </div>
+
+            <div class="row">
+                <div>
+                    <div class="form-group">
+                        <label>MJ 提示词 (Prompt)</label>
+                        <textarea id="mjstudio-prompt" placeholder="例如：A lone swordsman standing on a cliff above the sea, storm clouds, cinematic, dramatic light, highly detailed"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label>画面比例</label>
+                            <select id="mjstudio-aspect">
+                                <option value="1:1">1:1 方形</option>
+                                <option value="2:3">2:3 竖图</option>
+                                <option value="3:2">3:2 横图</option>
+                                <option value="9:16">9:16 竖屏</option>
+                                <option value="16:9">16:9 横屏</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>说明</label>
+                            <input value="Relax 模式 / ¥1.00 / 20秒轮询" readonly>
+                        </div>
+                    </div>
+                    <button class="generate-btn" onclick="generateMJStudioImage()">生成 Midjourney 图像</button>
+                </div>
+                <div>
+                    <div class="helper-card">
+                        <h3>控制说明</h3>
+                        <ul>
+                            <li><strong>U1-U4：</strong>放大四宫格中对应位置的图。</li>
+                            <li><strong>V1-V4：</strong>基于对应位置继续出变化版本。</li>
+                            <li><strong>REROLL：</strong>保留同一提示词重新抽一组。</li>
+                            <li><strong>MJ 编辑：</strong>适合做加元素、扩图、改构图、改比例。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="loading" id="mjstudio-loading">
+                <div class="spinner"></div>
+                <p>正在生成 Midjourney 图像...</p>
+            </div>
+
+            <div class="result" id="mjstudio-result">
+                <div class="status" id="mjstudio-status"></div>
+                <img id="mjstudio-output" src="" alt="Midjourney 结果图">
+                <div class="mj-actions" id="mjstudio-actions" style="display:none;"></div>
+                <div class="quick-actions" id="mjstudio-edit-actions" style="display:none; margin-top:12px;">
+                    <button class="mini-btn" onclick="sendCurrentMJToEdit()">✏️ 把当前结果带去 MJ 编辑</button>
+                    <button class="mini-btn" onclick="useCurrentMJInEdit('在画面外围扩展更多环境细节，保持原风格')">🪄 扩图编辑</button>
+                    <button class="mini-btn" onclick="useCurrentMJInEdit('在保持主体不变的前提下，增加更多场景元素和层次')">➕ 加元素编辑</button>
+                </div>
+            </div>
         </div>
 
         <!-- 图像生成面板 -->
-        <div id="image-panel" class="panel active">
+        <div id="image-panel" class="panel">
             <div class="form-group">
                 <label>提示词 (Prompt)</label>
                 <textarea id="image-prompt" placeholder="描述你想要生成的图像..."></textarea>
@@ -391,16 +505,141 @@
             aspect: "1:1"
         };
         
-        function switchTab(tab) {
+        function switchTab(tab, btn) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             
-            event.target.classList.add('active');
+            const targetBtn = btn || document.querySelector(`.tab[data-tab="${tab}"]`);
+            if (targetBtn) targetBtn.classList.add('active');
             document.getElementById(tab + '-panel').classList.add('active');
             
             if (tab === 'gallery') {
                 loadGallery();
             }
+        }
+        
+        function fillMJPrompt(text) {
+            document.getElementById('mjstudio-prompt').value = text;
+        }
+        function fillMJEditPrompt(text) {
+            switchTab('edit');
+            document.getElementById('edit-prompt').value = text;
+            document.getElementById('edit-prompt').focus();
+        }
+        
+        let mjStudioState = { taskId: null, buttons: [], prompt: null, aspect: "1:1", imageUrl: null };
+        
+        async function generateMJStudioImage() {
+            const prompt = document.getElementById('mjstudio-prompt').value;
+            const aspect = document.getElementById('mjstudio-aspect').value;
+            if (!prompt) { alert('请输入提示词'); return; }
+            
+            document.getElementById('mjstudio-loading').classList.add('show');
+            document.getElementById('mjstudio-result').classList.remove('show');
+            document.getElementById('mjstudio-actions').style.display = 'none';
+            document.getElementById('mjstudio-edit-actions').style.display = 'none';
+            
+            try {
+                document.getElementById('mjstudio-status').className = 'status pending';
+                document.getElementById('mjstudio-status').textContent = '⏳ Midjourney 提交中（Relax 模式，通常 1-2 分钟）...';
+                document.getElementById('mjstudio-result').classList.add('show');
+                
+                const response = await fetch(`${API_BASE}/api/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode: 'mj-imagine', prompt, aspect, noWait: true })
+                });
+                const data = await response.json();
+                if (!(data.success && data.taskId)) throw new Error(data.error || 'Midjourney 提交失败');
+                
+                mjStudioState = { taskId: data.taskId, buttons: [], prompt, aspect, imageUrl: null };
+                document.getElementById('mjstudio-status').textContent = `⏳ Midjourney 任务已提交：${data.taskId}，每 20 秒检查一次...`;
+                await pollMJStudioStatus(data.taskId);
+            } catch (err) {
+                document.getElementById('mjstudio-status').className = 'status error';
+                document.getElementById('mjstudio-status').textContent = '❌ ' + err.message;
+            } finally {
+                document.getElementById('mjstudio-loading').classList.remove('show');
+            }
+        }
+        
+        async function pollMJStudioStatus(taskId) {
+            const check = async () => {
+                try {
+                    const res = await fetch(`${API_BASE}/api/status?jobId=${taskId}&model=midjourney&type=mj`);
+                    const data = await res.json();
+                    if (data.status === 'completed') {
+                        document.getElementById('mjstudio-status').className = 'status success';
+                        document.getElementById('mjstudio-status').textContent = `✅ Midjourney 完成！价格: ${data.price || '¥1.00'}`;
+                        document.getElementById('mjstudio-output').src = data.imageUrl;
+                        document.getElementById('mjstudio-result').classList.add('show');
+                        mjStudioState.taskId = taskId;
+                        mjStudioState.buttons = data.buttons || [];
+                        mjStudioState.imageUrl = data.imageUrl;
+                        renderMJStudioButtons();
+                        saveToGallery('image', data.imageUrl, mjStudioState.prompt, 'midjourney');
+                    } else if (data.status === 'failure' || data.status === 'failed' || data.error) {
+                        throw new Error(data.message || data.error || 'Midjourney 生成失败');
+                    } else {
+                        document.getElementById('mjstudio-status').className = 'status pending';
+                        document.getElementById('mjstudio-status').textContent = `⏳ Midjourney 生成中（任务 ${taskId}），20 秒后继续检查...`;
+                        setTimeout(check, 20000);
+                    }
+                } catch (err) {
+                    document.getElementById('mjstudio-status').className = 'status error';
+                    document.getElementById('mjstudio-status').textContent = '❌ ' + err.message;
+                }
+            };
+            check();
+        }
+        
+        function renderMJStudioButtons() {
+            const container = document.getElementById('mjstudio-actions');
+            const labels = ['U1','U2','U3','U4','V1','V2','V3','V4','REROLL'];
+            container.innerHTML = labels.map(l => `<button class="mj-btn" onclick="handleMJStudioAction('${l}')">${l}</button>`).join('');
+            container.style.display = 'flex';
+            document.getElementById('mjstudio-edit-actions').style.display = 'flex';
+        }
+        
+        async function handleMJStudioAction(label) {
+            if (!mjStudioState.taskId) { alert('没有可操作的 Midjourney 任务'); return; }
+            document.getElementById('mjstudio-loading').classList.add('show');
+            document.getElementById('mjstudio-status').className = 'status pending';
+            document.getElementById('mjstudio-status').textContent = `⏳ 正在执行 ${label}...`;
+            
+            try {
+                let payload;
+                if (label === 'REROLL') {
+                    payload = { mode: 'mj-imagine', prompt: mjStudioState.prompt, aspect: mjStudioState.aspect, noWait: true };
+                } else if (label.startsWith('U')) {
+                    payload = { mode: 'mj-upscale', taskId: mjStudioState.taskId, button: label };
+                } else {
+                    payload = { mode: 'mj-variation', taskId: mjStudioState.taskId, button: label };
+                }
+                const res = await fetch(`${API_BASE}/api/generate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const data = await res.json();
+                if (!(data.success && data.taskId)) throw new Error(data.error || `${label} 提交失败`);
+                mjStudioState.taskId = data.taskId;
+                mjStudioState.buttons = [];
+                await pollMJStudioStatus(data.taskId);
+            } catch (err) {
+                document.getElementById('mjstudio-status').className = 'status error';
+                document.getElementById('mjstudio-status').textContent = '❌ ' + err.message;
+            } finally {
+                document.getElementById('mjstudio-loading').classList.remove('show');
+            }
+        }
+        
+        function sendCurrentMJToEdit() {
+            if (!mjStudioState.imageUrl) { alert('还没有可用的结果图'); return; }
+            useForMJEdit(mjStudioState.imageUrl);
+        }
+        function useCurrentMJInEdit(editPrompt) {
+            if (!mjStudioState.imageUrl) { alert('还没有可用的结果图'); return; }
+            document.getElementById('edit-image-url').value = mjStudioState.imageUrl;
+            document.getElementById('edit-prompt').value = editPrompt;
+            switchTab('edit', document.querySelector('.tab[data-tab="edit"]'));
+            document.getElementById('edit-prompt').focus();
         }
         
         async function generateImage() {
@@ -769,7 +1008,7 @@
 
         function useForMJEdit(imageUrl) {
             document.getElementById('edit-image-url').value = imageUrl;
-            switchTab('edit');
+            switchTab('edit', document.querySelector('.tab[data-tab="edit"]'));
             document.getElementById('edit-prompt').focus();
         }
     </script>
