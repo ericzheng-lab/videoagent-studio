@@ -28,10 +28,9 @@ async function mjEdits(params, apiKey) {
   const endpoint = `${MJ_BASE_URL}/mj/submit/edits`;
 
   const body = {
-    prompt,
+    prompt: aspect && aspect !== "1:1" ? `${prompt} --ar ${aspect}` : prompt,
     image,
     ...(maskBase64 && { maskBase64 }),
-    ...(aspect && { aspect_ratio: aspect }),
   };
 
   const response = await fetch(endpoint, {
