@@ -258,19 +258,43 @@ async function checkMJStatus(taskId, apiKey) {
 
   const data = await response.json();
 
+  // bltcy.ai 查询接口直接返回任务对象，不是 {code, description, result} 包装
+  // 检查是否有 id 字段来判断是否是任务对象
+  if (data.id) {
+    // 直接是任务对象
+    const status = data.status;  // NOT_START, SUBMITTED, MODAL, IN_PROGRESS, SUCCESS, FAILURE
+
+    if (status === "SUCCESS") {
+      return {
+        success: true,
+        status: "completed",
+        imageUrl: data.imageUrl,
+        buttons: data.buttons,  // U1, U2, U3, U4, V1, V2, V3, V4
+        seed: data.seed,
+      };
+    }
+
+    return {
+      success: true,
+      status: status.toLowerCase(),
+      message: `Task ${status}`,
+    };
+  }
+
+  // 如果是 {code, description, result} 格式
   if (data.code !== 1) {
     throw new Error(`Failed to check status: ${data.description}`);
   }
 
   const result = data.result;
-  const status = result.status;  // NOT_START, SUBMITTED, MODAL, IN_PROGRESS, SUCCESS, FAILURE
+  const status = result.status;
 
   if (status === "SUCCESS") {
     return {
       success: true,
       status: "completed",
       imageUrl: result.imageUrl,
-      buttons: result.buttons,  // U1, U2, U3, U4, V1, V2, V3, V4
+      buttons: result.buttons,
       seed: result.seed,
     };
   }
