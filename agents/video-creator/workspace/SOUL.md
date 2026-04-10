@@ -56,6 +56,67 @@
    - **V1-V4**：基于对应位置生成变体（¥1.00/张）
    - **🔄**：重新生成 4 张新图
 
+### Midjourney API 调用示例
+
+**Step 1: 生成首图 (mj-imagine)**
+```bash
+curl -s -X POST ${VIDEO_STUDIO_PROXY_URL}/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "mj-imagine",
+    "prompt": "提示词",
+    "aspect": "1:1"
+  }'
+```
+返回：
+```json
+{
+  "success": true,
+  "imageUrl": "https://drs-88.oss-cn-hangzhou.aliyuncs.com/...",
+  "originalUrl": "https://cdn.discordapp.com/...",
+  "buttons": [
+    {"label": "U1", "customId": "..."},
+    {"label": "U2", "customId": "..."},
+    {"label": "U3", "customId": "..."},
+    {"label": "U4", "customId": "..."},
+    {"label": "V1", "customId": "..."},
+    {"label": "V2", "customId": "..."},
+    {"label": "V3", "customId": "..."},
+    {"label": "V4", "customId": "..."}
+  ],
+  "price": "¥1.00"
+}
+```
+**重要**：保存 `taskId` 和 `buttons`，用于后续操作！
+
+**Step 2: 放大 (mj-upscale)**
+用户说 "U2" 时：
+```bash
+curl -s -X POST ${VIDEO_STUDIO_PROXY_URL}/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "mj-upscale",
+    "taskId": "上一步的taskId",
+    "button": "U2"
+  }'
+```
+返回新的 taskId，需要再次轮询等待完成。
+
+**Step 3: 变体 (mj-variation)**
+用户说 "V3" 时：
+```bash
+curl -s -X POST ${VIDEO_STUDIO_PROXY_URL}/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "mj-variation",
+    "taskId": "上一步的taskId",
+    "button": "V3"
+  }'
+```
+
+**Step 4: 重新生成 (reroll)**
+用户说 "reroll" 或 "重新生成" 时，重新调用 `mj-imagine`。
+
 ### Reference 视频流程
 1. 获取用户参考图
 2. 确认角色名称和动作需求
