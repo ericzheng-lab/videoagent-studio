@@ -19,6 +19,7 @@
   "models": {
     "image": {
       "flux": {"price": "¥0.01", "description": "最便宜，质量优秀"},
+      "midjourney": {"price": "¥1.00", "description": "高质量艺术图像，支持放大变体"},
       "grok-4.1-image": {"price": "¥0.1", "description": "Grok 图像模型"},
       "seedream-3.0": {"price": "¥0.1", "description": "即梦，中文好"}
     },
