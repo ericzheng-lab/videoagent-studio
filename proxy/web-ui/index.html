@@ -749,7 +749,7 @@
                 return;
             }
             
-            grid.innerHTML = gallery.map(item => `
+            grid.innerHTML = gallery.map((item, index) => `
                 <div class="gallery-item">
                     ${item.type === 'image' 
                         ? `<img src="${item.url}" alt="">`
@@ -759,9 +759,18 @@
                         <h4>${item.model}</h4>
                         <p>${item.prompt.slice(0, 50)}...</p>
                         <p>${new Date(item.time).toLocaleString()}</p>
+                        ${item.type === 'image' ? `
+                            <button class="mj-btn" onclick="useForMJEdit('${item.url}')" style="margin-top:10px;width:100%;">✏️ 用作 MJ 编辑</button>
+                        ` : ''}
                     </div>
                 </div>
             `).join('');
+        }
+
+        function useForMJEdit(imageUrl) {
+            document.getElementById('edit-image-url').value = imageUrl;
+            switchTab('edit');
+            document.getElementById('edit-prompt').focus();
         }
     </script>
 </body>
