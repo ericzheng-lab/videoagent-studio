@@ -1,11 +1,12 @@
 /**
  * GET /api/status?jobId=&model= — Async job status for bltcy.ai
- * Supports Kling, Runway, and cheap video models
+ * Supports Kling, Runway, Wan, and Midjourney
  */
 
 const { checkKlingStatus } = require("../generate-kling");
 const { checkRunwayStatus } = require("../generate-runway");
 const { checkCheapVideoStatus } = require("../generate-cheap-video");
+const { checkMJStatus } = require("../generate-midjourney");
 
 const BLTCY_API_KEY = process.env.BLTCY_API_KEY || "";
 
@@ -48,7 +49,12 @@ module.exports = async function handler(req, res) {
   try {
     let result;
     
-    if (model.includes("kling")) {
+    if (model.includes("midjourney") || model === "mj" || req.query?.type === "mj") {
+      result = await checkMJStatus(jobId, apiKey);
+      if (result && result.success && result.status === "completed") {
+        result.price = "¥1.00";
+      }
+    } else if (model.includes("kling")) {
       result = await checkKlingStatus(jobId, apiKey);
     } else if (model.includes("runway")) {
       result = await checkRunwayStatus(jobId, apiKey);
@@ -62,7 +68,14 @@ module.exports = async function handler(req, res) {
         try {
           result = await checkRunwayStatus(jobId, apiKey);
         } catch {
-          result = await checkCheapVideoStatus(jobId, model, apiKey);
+          try {
+            result = await checkMJStatus(jobId, apiKey);
+            if (result && result.success && result.status === "completed") {
+              result.price = "¥1.00";
+            }
+          } catch {
+            result = await checkCheapVideoStatus(jobId, model, apiKey);
+          }
         }
       }
     }
