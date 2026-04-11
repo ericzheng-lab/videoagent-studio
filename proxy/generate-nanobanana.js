@@ -48,14 +48,18 @@ async function nanoBananaGenerate(params, apiKey) {
   // 格式1: 直接返回图片 URL
   let imageUrl = data.imageUrl || data.url || data.image_url;
   
-  // 格式2: OpenAI 兼容格式 (data[0].url)
+  // 格式2: OpenAI 兼容格式 (data[0].url / b64_json)
   if (!imageUrl && data.data && data.data[0]) {
-    imageUrl = data.data[0].url || data.data[0].b64_json;
+    if (data.data[0].url) {
+      imageUrl = data.data[0].url;
+    } else if (data.data[0].b64_json) {
+      imageUrl = `data:image/png;base64,${data.data[0].b64_json}`;
+    }
   }
   
   // 格式3: 嵌套在 result 中
-  if (!imageUrl && data.result) {
-    imageUrl = data.result.url || data.result.imageUrl || data.result.image_url;
+  if (!imageUrl && data.result && typeof data.result === 'object') {
+    imageUrl = data.result.url || data.result.imageUrl || data.result.image_url || (data.result.b64_json ? `data:image/png;base64,${data.result.b64_json}` : null);
   }
 
   if (imageUrl) {
@@ -102,7 +106,7 @@ async function nanoBananaGenerate(params, apiKey) {
   }
 
   // 如果返回 taskId，需要轮询
-  const taskId = data.result || data.task_id || data.id;
+  const taskId = (typeof data.result === 'string' ? data.result : null) || data.task_id || data.id || data.taskId;
   if (!taskId) {
     throw new Error("No taskId returned from NanoBanana");
   }
@@ -164,11 +168,15 @@ async function nanoBananaEdit(params, apiKey) {
   let imageUrl = data.imageUrl || data.url || data.image_url;
   
   if (!imageUrl && data.data && data.data[0]) {
-    imageUrl = data.data[0].url || data.data[0].b64_json;
+    if (data.data[0].url) {
+      imageUrl = data.data[0].url;
+    } else if (data.data[0].b64_json) {
+      imageUrl = `data:image/png;base64,${data.data[0].b64_json}`;
+    }
   }
   
-  if (!imageUrl && data.result) {
-    imageUrl = data.result.url || data.result.imageUrl || data.result.image_url;
+  if (!imageUrl && data.result && typeof data.result === 'object') {
+    imageUrl = data.result.url || data.result.imageUrl || data.result.image_url || (data.result.b64_json ? `data:image/png;base64,${data.result.b64_json}` : null);
   }
 
   if (imageUrl) {
@@ -248,9 +256,19 @@ async function checkNanoBananaStatus(taskId, apiKey) {
 
   const data = await response.json();
 
-  // 直接返回图片 URL 表示完成
-  if (data.imageUrl || data.url || (data.status === "completed" || data.status === "success")) {
-    const imageUrl = data.imageUrl || data.url || data.result;
+  // 直接返回图片 URL / base64 表示完成
+  let imageUrl = data.imageUrl || data.url || data.image_url;
+  if (!imageUrl && data.data && data.data[0]) {
+    imageUrl = data.data[0].url || (data.data[0].b64_json ? `data:image/png;base64,${data.data[0].b64_json}` : null);
+  }
+  if (!imageUrl && data.result && typeof data.result === 'object') {
+    imageUrl = data.result.url || data.result.imageUrl || data.result.image_url || (data.result.b64_json ? `data:image/png;base64,${data.result.b64_json}` : null);
+  }
+  if (!imageUrl && typeof data.result === 'string' && /^https?:\/\//.test(data.result)) {
+    imageUrl = data.result;
+  }
+
+  if (imageUrl || (data.status === "completed" || data.status === "success")) {
     return {
       success: true,
       status: "completed",
