@@ -1016,8 +1016,8 @@
 
             try {
                 const payload = mode === 'edit'
-                    ? { mode: 'nano-banana-edit', prompt, image: imageUrl, aspect, noWait: true }
-                    : { mode: 'nano-banana-generate', prompt, aspect, noWait: true };
+                    ? { mode: 'nano-banana-edit', prompt, image: imageUrl, aspect }
+                    : { mode: 'nano-banana-generate', prompt, aspect };
 
                 const response = await fetch(`${API_BASE}/api/generate`, {
                     method: 'POST',
@@ -1026,23 +1026,15 @@
                 });
                 const data = await response.json();
 
-                if (data.success && data.imageUrl) {
+                if (data.success && data.images && data.images[0]) {
                     document.getElementById('nanobanana-status').className = 'status success';
                     document.getElementById('nanobanana-status').textContent = `✅ NanoBanana 完成！价格: ${data.price || '¥2.00'}`;
-                    document.getElementById('nanobanana-output').src = data.imageUrl;
+                    document.getElementById('nanobanana-output').src = data.images[0].url;
                     document.getElementById('nanobanana-result').classList.add('show');
-                    saveToGallery('image', data.imageUrl, prompt, 'nano-banana-pro-4k');
-                    return;
+                    saveToGallery('image', data.images[0].url, prompt, 'nano-banana-pro-4k');
+                } else {
+                    throw new Error(data.error || 'NanoBanana 失败');
                 }
-
-                if (!(data.success && data.taskId)) {
-                    throw new Error(data.error || 'NanoBanana 提交失败');
-                }
-
-                document.getElementById('nanobanana-status').className = 'status pending';
-                document.getElementById('nanobanana-status').textContent = `⏳ NanoBanana 已提交：${data.taskId}，10秒检查一次...`;
-                document.getElementById('nanobanana-result').classList.add('show');
-                await pollNanoBananaStatus(data.taskId);
             } catch (err) {
                 document.getElementById('nanobanana-status').className = 'status error';
                 document.getElementById('nanobanana-status').textContent = '❌ ' + err.message;
@@ -1058,12 +1050,12 @@
                     const response = await fetch(`${API_BASE}/api/status?jobId=${taskId}&model=nano-banana-pro-4k&type=nanobanana`);
                     const data = await response.json();
 
-                    if (data.status === 'completed') {
+                    if (data.success && data.images && data.images[0]) {
                         document.getElementById('nanobanana-status').className = 'status success';
                         document.getElementById('nanobanana-status').textContent = `✅ NanoBanana 完成！价格: ${data.price || '¥2.00'}`;
-                        document.getElementById('nanobanana-output').src = data.imageUrl;
+                        document.getElementById('nanobanana-output').src = data.images[0].url;
                         document.getElementById('nanobanana-result').classList.add('show');
-                        saveToGallery('image', data.imageUrl, document.getElementById('nanobanana-prompt').value, 'nano-banana-pro-4k');
+                        saveToGallery('image', data.images[0].url, document.getElementById('nanobanana-prompt').value, 'nano-banana-pro-4k');
                     } else if (data.status === 'failure' || data.status === 'failed' || data.error) {
                         throw new Error(data.message || data.error || 'NanoBanana 失败');
                     } else {

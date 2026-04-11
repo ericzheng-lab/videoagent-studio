@@ -1,6 +1,6 @@
 /**
- * NanoBanana Pro Adapter
- * 支持图像生成和编辑
+ * NanoBanana Pro Adapter - 简化版
+ * 直接返回图片，不走 taskId 轮询
  * 使用 bltcy.ai API
  */
 
@@ -8,14 +8,10 @@ const MJ_BASE_URL = "https://api.bltcy.ai";
 const { uploadImage } = require('./image-upload');
 
 /**
- * NanoBanana Generate - 文生图
- * @param {Object} params
- * @param {string} params.prompt - 提示词
- * @param {string} params.aspect - 比例 1:1, 16:9, 9:16, 4:3, 3:4
- * @param {string} apiKey
+ * NanoBanana Generate - 文生图 (同步返回)
  */
 async function nanoBananaGenerate(params, apiKey) {
-  const { prompt, aspect = "1:1", noWait = false } = params;
+  const { prompt, aspect = "1:1" } = params;
 
   const endpoint = `${MJ_BASE_URL}/v1/images/generation`;
 
@@ -24,6 +20,8 @@ async function nanoBananaGenerate(params, apiKey) {
     prompt,
     aspect_ratio: aspect,
   };
+
+  console.log('[NanoBanana] Request:', endpoint, JSON.stringify(body));
 
   const response = await fetch(endpoint, {
     method: "POST",
@@ -34,107 +32,80 @@ async function nanoBananaGenerate(params, apiKey) {
     body: JSON.stringify(body),
   });
 
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`HTTP ${response.status}: ${errorText}`);
+  }
+
   const data = await response.json();
+  console.log('[NanoBanana] Response:', JSON.stringify(data).slice(0, 1000));
 
-  // 调试日志
-  console.log('[NanoBanana] Response:', JSON.stringify(data).slice(0, 500));
-
-  // 检查错误
-  if (data.code !== 1 && data.code !== undefined && data.code !== 0 && data.code !== '0') {
-    throw new Error(`NanoBanana Generate failed: ${data.description || data.message || data.error || JSON.stringify(data)}`);
-  }
-
-  // 处理多种可能的返回格式
-  // 格式1: 直接返回图片 URL
-  let imageUrl = data.imageUrl || data.url || data.image_url;
+  // 提取图片 URL 或 base64
+  let imageUrl = data.url || data.imageUrl || data.image_url;
+  let base64Data = null;
   
-  // 格式2: OpenAI 兼容格式 (data[0].url / b64_json)
+  // OpenAI 格式
   if (!imageUrl && data.data && data.data[0]) {
-    if (data.data[0].url) {
-      imageUrl = data.data[0].url;
-    } else if (data.data[0].b64_json) {
-      imageUrl = `data:image/png;base64,${data.data[0].b64_json}`;
-    }
+    imageUrl = data.data[0].url;
+    base64Data = data.data[0].b64_json;
   }
   
-  // 格式3: 嵌套在 result 中
-  if (!imageUrl && data.result && typeof data.result === 'object') {
-    imageUrl = data.result.url || data.result.imageUrl || data.result.image_url || (data.result.b64_json ? `data:image/png;base64,${data.result.b64_json}` : null);
+  // 嵌套 result
+  if (!imageUrl && data.result) {
+    if (typeof data.result === 'string') {
+      imageUrl = data.result;
+    } else if (typeof data.result === 'object') {
+      imageUrl = data.result.url || data.result.imageUrl || data.result.image_url;
+      base64Data = data.result.b64_json || base64Data;
+    }
   }
 
+  // 有 base64 但没有 URL，直接返回 data URL
+  if (!imageUrl && base64Data) {
+    return {
+      success: true,
+      images: [{
+        url: `data:image/png;base64,${base64Data}`,
+      }],
+      price: "¥2.00",
+      model: "nano-banana-pro-4k",
+    };
+  }
+
+  // 有 URL，尝试上传到 OSS
   if (imageUrl) {
-    // 如果是 base64，直接处理
-    if (imageUrl.startsWith('data:image')) {
-      const base64Data = imageUrl.split(',')[1];
-      try {
-        const ossUrl = await uploadImage(base64Data, `nanobanana-${Date.now()}.png`);
-        return {
-          success: true,
-          imageUrl: ossUrl,
-          price: "¥2.00",
-        };
-      } catch (e) {
-        return {
-          success: true,
-          imageUrl,
-          price: "¥2.00",
-          warning: "OSS upload failed",
-        };
-      }
-    }
-    
-    // 上传到 OSS
     try {
-      const imageResponse = await fetch(imageUrl);
-      const imageBuffer = await imageResponse.arrayBuffer();
-      const base64Data = Buffer.from(imageBuffer).toString('base64');
-      const ossUrl = await uploadImage(base64Data, `nanobanana-${Date.now()}.png`);
+      const imgRes = await fetch(imageUrl);
+      const imgBuf = await imgRes.arrayBuffer();
+      const b64 = Buffer.from(imgBuf).toString('base64');
+      const ossUrl = await uploadImage(b64, `nanobanana-${Date.now()}.png`);
       return {
         success: true,
-        imageUrl: ossUrl,
-        originalUrl: imageUrl,
+        images: [{ url: ossUrl }],
         price: "¥2.00",
+        model: "nano-banana-pro-4k",
       };
     } catch (e) {
+      console.error('[NanoBanana] OSS upload failed:', e.message);
+      // 返回原始 URL
       return {
         success: true,
-        imageUrl,
+        images: [{ url: imageUrl }],
         price: "¥2.00",
+        model: "nano-banana-pro-4k",
         warning: "OSS upload failed",
       };
     }
   }
 
-  // 如果返回 taskId，需要轮询
-  const taskId = (typeof data.result === 'string' ? data.result : null) || data.task_id || data.id || data.taskId;
-  if (!taskId) {
-    throw new Error("No taskId returned from NanoBanana");
-  }
-
-  if (noWait) {
-    return {
-      success: true,
-      taskId,
-      status: "submitted",
-      message: "Task submitted. Use status endpoint to check.",
-    };
-  }
-
-  // 等待完成
-  const result = await waitForNanoBananaTask(taskId, apiKey);
-  return result;
+  throw new Error(`No image in response: ${JSON.stringify(data).slice(0, 200)}`);
 }
 
 /**
- * NanoBanana Edit - 图生图/编辑
- * @param {Object} params
- * @param {string} params.prompt - 编辑提示词
- * @param {string} params.image - 原图 URL
- * @param {string} params.aspect - 可选，目标比例
- * @param {string} apiKey
+ * NanoBanana Edit - 图生图 (同步返回)
  */
 async function nanoBananaEdit(params, apiKey) {
-  const { prompt, image, aspect = "1:1", noWait = false } = params;
+  const { prompt, image, aspect = "1:1" } = params;
 
   const endpoint = `${MJ_BASE_URL}/v1/images/edits`;
 
@@ -145,6 +116,8 @@ async function nanoBananaEdit(params, apiKey) {
     ...(aspect && { aspect_ratio: aspect }),
   };
 
+  console.log('[NanoBanana Edit] Request:', endpoint, JSON.stringify(body));
+
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -154,196 +127,70 @@ async function nanoBananaEdit(params, apiKey) {
     body: JSON.stringify(body),
   });
 
-  const data = await response.json();
-
-  // 调试日志
-  console.log('[NanoBanana Edit] Response:', JSON.stringify(data).slice(0, 500));
-
-  // 检查错误
-  if (data.code !== 1 && data.code !== undefined && data.code !== 0 && data.code !== '0') {
-    throw new Error(`NanoBanana Edit failed: ${data.description || data.message || data.error || JSON.stringify(data)}`);
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`HTTP ${response.status}: ${errorText}`);
   }
 
-  // 处理多种可能的返回格式
-  let imageUrl = data.imageUrl || data.url || data.image_url;
+  const data = await response.json();
+  console.log('[NanoBanana Edit] Response:', JSON.stringify(data).slice(0, 1000));
+
+  // 同样的提取逻辑
+  let imageUrl = data.url || data.imageUrl || data.image_url;
+  let base64Data = null;
   
   if (!imageUrl && data.data && data.data[0]) {
-    if (data.data[0].url) {
-      imageUrl = data.data[0].url;
-    } else if (data.data[0].b64_json) {
-      imageUrl = `data:image/png;base64,${data.data[0].b64_json}`;
-    }
+    imageUrl = data.data[0].url;
+    base64Data = data.data[0].b64_json;
   }
   
-  if (!imageUrl && data.result && typeof data.result === 'object') {
-    imageUrl = data.result.url || data.result.imageUrl || data.result.image_url || (data.result.b64_json ? `data:image/png;base64,${data.result.b64_json}` : null);
+  if (!imageUrl && data.result) {
+    if (typeof data.result === 'string') {
+      imageUrl = data.result;
+    } else if (typeof data.result === 'object') {
+      imageUrl = data.result.url || data.result.imageUrl || data.result.image_url;
+      base64Data = data.result.b64_json || base64Data;
+    }
+  }
+
+  if (!imageUrl && base64Data) {
+    return {
+      success: true,
+      images: [{
+        url: `data:image/png;base64,${base64Data}`,
+      }],
+      price: "¥2.00",
+      model: "nano-banana-pro-4k",
+    };
   }
 
   if (imageUrl) {
-    // 如果是 base64
-    if (imageUrl.startsWith('data:image')) {
-      const base64Data = imageUrl.split(',')[1];
-      try {
-        const ossUrl = await uploadImage(base64Data, `nanobanana-edit-${Date.now()}.png`);
-        return {
-          success: true,
-          imageUrl: ossUrl,
-          price: "¥2.00",
-        };
-      } catch (e) {
-        return {
-          success: true,
-          imageUrl,
-          price: "¥2.00",
-          warning: "OSS upload failed",
-        };
-      }
-    }
-    
-    // 上传到 OSS
     try {
-      const imageResponse = await fetch(imageUrl);
-      const imageBuffer = await imageResponse.arrayBuffer();
-      const base64Data = Buffer.from(imageBuffer).toString('base64');
-      const ossUrl = await uploadImage(base64Data, `nanobanana-edit-${Date.now()}.png`);
+      const imgRes = await fetch(imageUrl);
+      const imgBuf = await imgRes.arrayBuffer();
+      const b64 = Buffer.from(imgBuf).toString('base64');
+      const ossUrl = await uploadImage(b64, `nanobanana-edit-${Date.now()}.png`);
       return {
         success: true,
-        imageUrl: ossUrl,
-        originalUrl: imageUrl,
+        images: [{ url: ossUrl }],
         price: "¥2.00",
+        model: "nano-banana-pro-4k",
       };
     } catch (e) {
       return {
         success: true,
-        imageUrl,
+        images: [{ url: imageUrl }],
         price: "¥2.00",
+        model: "nano-banana-pro-4k",
         warning: "OSS upload failed",
       };
     }
   }
 
-  // 如果返回 taskId，需要轮询
-  const taskId = data.result || data.task_id || data.id || data.taskId;
-  if (!taskId) {
-    throw new Error(`No taskId returned from NanoBanana Edit. Response: ${JSON.stringify(data).slice(0, 200)}`);
-  }
-
-  if (noWait) {
-    return {
-      success: true,
-      taskId,
-      status: "submitted",
-      message: "Edit task submitted. Use status endpoint to check.",
-    };
-  }
-
-  // 等待完成
-  const result = await waitForNanoBananaTask(taskId, apiKey);
-  return result;
-}
-
-/**
- * 查询 NanoBanana 任务状态
- */
-async function checkNanoBananaStatus(taskId, apiKey) {
-  const endpoint = `${MJ_BASE_URL}/v1/images/status/${taskId}`;
-
-  const response = await fetch(endpoint, {
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-    },
-  });
-
-  const data = await response.json();
-
-  // 直接返回图片 URL / base64 表示完成
-  let imageUrl = data.imageUrl || data.url || data.image_url;
-  if (!imageUrl && data.data && data.data[0]) {
-    imageUrl = data.data[0].url || (data.data[0].b64_json ? `data:image/png;base64,${data.data[0].b64_json}` : null);
-  }
-  if (!imageUrl && data.result && typeof data.result === 'object') {
-    imageUrl = data.result.url || data.result.imageUrl || data.result.image_url || (data.result.b64_json ? `data:image/png;base64,${data.result.b64_json}` : null);
-  }
-  if (!imageUrl && typeof data.result === 'string' && /^https?:\/\//.test(data.result)) {
-    imageUrl = data.result;
-  }
-
-  if (imageUrl || (data.status === "completed" || data.status === "success")) {
-    return {
-      success: true,
-      status: "completed",
-      imageUrl,
-      originalUrl: imageUrl,
-    };
-  }
-
-  // 还在处理中
-  if (data.status === "pending" || data.status === "processing" || data.status === "in_progress") {
-    return {
-      success: true,
-      status: "pending",
-      message: "Task in progress",
-    };
-  }
-
-  // 失败
-  if (data.status === "failed" || data.status === "error") {
-    throw new Error(data.message || data.error || "NanoBanana task failed");
-  }
-
-  // 未知状态，假设还在处理
-  return {
-    success: true,
-    status: "pending",
-    message: "Unknown status, treating as pending",
-  };
-}
-
-/**
- * 等待 NanoBanana 任务完成
- */
-async function waitForNanoBananaTask(taskId, apiKey, maxAttempts = 60) {
-  for (let i = 0; i < maxAttempts; i++) {
-    const result = await checkNanoBananaStatus(taskId, apiKey);
-    
-    if (result.status === "completed") {
-      // 上传到 OSS
-      if (result.imageUrl) {
-        try {
-          const imageResponse = await fetch(result.imageUrl);
-          const imageBuffer = await imageResponse.arrayBuffer();
-          const base64Data = Buffer.from(imageBuffer).toString('base64');
-          const ossUrl = await uploadImage(base64Data, `nanobanana-${Date.now()}.png`);
-          return {
-            ...result,
-            imageUrl: ossUrl,
-            originalUrl: result.imageUrl,
-            price: "¥2.00",
-          };
-        } catch (e) {
-          return {
-            ...result,
-            price: "¥2.00",
-            warning: "OSS upload failed",
-          };
-        }
-      }
-      return { ...result, price: "¥2.00" };
-    }
-    
-    if (result.status === "failure") {
-      throw new Error("NanoBanana task failed");
-    }
-
-    // 等待 10 秒
-    await new Promise(resolve => setTimeout(resolve, 10000));
-  }
-
-  throw new Error("Timeout waiting for NanoBanana task");
+  throw new Error(`No image in response: ${JSON.stringify(data).slice(0, 200)}`);
 }
 
 module.exports = {
   nanoBananaGenerate,
   nanoBananaEdit,
-  checkNanoBananaStatus,
 };
