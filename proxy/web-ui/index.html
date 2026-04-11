@@ -284,6 +284,7 @@
         <div class="tabs">
             <button class="tab active" data-tab="mjstudio" onclick="switchTab('mjstudio', this)">🎛️ MJ Studio</button>
             <button class="tab" data-tab="image" onclick="switchTab('image', this)">🖼️ 图像生成</button>
+            <button class="tab" data-tab="nanobanana" onclick="switchTab('nanobanana', this)">🍌 NanoBanana</button>
             <button class="tab" data-tab="edit" onclick="switchTab('edit', this)">✏️ MJ 编辑</button>
             <button class="tab" data-tab="video" onclick="switchTab('video', this)">🎬 视频生成</button>
             <button class="tab" data-tab="gallery" onclick="switchTab('gallery', this)">📁 作品库</button>
@@ -377,6 +378,7 @@
                     <select id="image-model">
                         <option value="flux">Flux <span class="price-tag">¥0.01</span></option>
                         <option value="midjourney">Midjourney <span class="price-tag">¥1.00</span></option>
+                        <option value="nano-banana-pro-4k">NanoBanana Pro 4K <span class="price-tag">¥2.00</span></option>
                         <option value="grok-4.1-image">Grok 4.1 Image <span class="price-tag">¥0.10</span></option>
                         <option value="grok-4.2-image">Grok 4.2 Image <span class="price-tag">¥0.12</span></option>
                         <option value="seedream-3.0">Seedream 3.0 <span class="price-tag">¥0.10</span></option>
@@ -441,6 +443,68 @@
             <div class="result" id="edit-result">
                 <div class="status" id="edit-status"></div>
                 <img id="edit-output" src="" alt="编辑后的图像">
+            </div>
+        </div>
+
+        <!-- NanoBanana 面板 -->
+        <div id="nanobanana-panel" class="panel">
+            <div class="helper-card">
+                <h3>NanoBanana Pro 4K</h3>
+                <p>适合直接做高质量生成与编辑。默认模型 <strong>nano-banana-pro-4k</strong>，价格按 <strong>¥2.00</strong> 展示。编辑不强制要求 mask，按你现在确认的方式走。</p>
+            </div>
+            <div class="row">
+                <div>
+                    <div class="form-group">
+                        <label>模式</label>
+                        <select id="nanobanana-mode">
+                            <option value="generate">文生图</option>
+                            <option value="edit">编辑已有图片</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>提示词 (Prompt)</label>
+                        <textarea id="nanobanana-prompt" placeholder="例如：强化金属质感，提升电影级光影，保留主体构图"></textarea>
+                    </div>
+                    <div class="form-group" id="nanobanana-image-group" style="display:none;">
+                        <label>原图 URL</label>
+                        <input id="nanobanana-image-url" placeholder="输入要编辑的图片 URL">
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label>画面比例</label>
+                            <select id="nanobanana-aspect">
+                                <option value="1:1">1:1 方形</option>
+                                <option value="2:3">2:3 竖图</option>
+                                <option value="3:2">3:2 横图</option>
+                                <option value="9:16">9:16 竖屏</option>
+                                <option value="16:9">16:9 横屏</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>说明</label>
+                            <input value="NanoBanana / ¥2.00 / prompt + aspect" readonly>
+                        </div>
+                    </div>
+                    <button class="generate-btn" onclick="generateNanoBanana()">提交 NanoBanana</button>
+                </div>
+                <div>
+                    <div class="helper-card">
+                        <h3>使用建议</h3>
+                        <ul>
+                            <li><strong>文生图：</strong>直接输入 prompt + aspect。</li>
+                            <li><strong>编辑：</strong>输入原图 URL + prompt + aspect，不强制 mask。</li>
+                            <li><strong>适合：</strong>整体风格增强、材质强化、细节重绘、直接高质量输出。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="loading" id="nanobanana-loading">
+                <div class="spinner"></div>
+                <p>正在提交 NanoBanana 任务...</p>
+            </div>
+            <div class="result" id="nanobanana-result">
+                <div class="status" id="nanobanana-status"></div>
+                <img id="nanobanana-output" src="" alt="NanoBanana 结果图">
             </div>
         </div>
 
@@ -528,6 +592,14 @@
             document.getElementById('edit-prompt').value = text;
             document.getElementById('edit-prompt').focus();
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const modeEl = document.getElementById('nanobanana-mode');
+            if (modeEl) {
+                modeEl.addEventListener('change', toggleNanoBananaMode);
+                toggleNanoBananaMode();
+            }
+        });
         
         let mjStudioState = { taskId: null, buttons: [], prompt: null, aspect: "1:1", imageUrl: null, originalUrl: null };
         
@@ -918,6 +990,95 @@
             checkStatus();
         }
         
+        function toggleNanoBananaMode() {
+            const mode = document.getElementById('nanobanana-mode')?.value || 'generate';
+            const imageGroup = document.getElementById('nanobanana-image-group');
+            if (imageGroup) imageGroup.style.display = mode === 'edit' ? 'block' : 'none';
+        }
+
+        async function generateNanoBanana() {
+            const mode = document.getElementById('nanobanana-mode').value;
+            const prompt = document.getElementById('nanobanana-prompt').value;
+            const aspect = document.getElementById('nanobanana-aspect').value;
+            const imageUrl = document.getElementById('nanobanana-image-url').value;
+
+            if (!prompt) {
+                alert('请输入提示词');
+                return;
+            }
+            if (mode === 'edit' && !imageUrl) {
+                alert('编辑模式请输入原图 URL');
+                return;
+            }
+
+            document.getElementById('nanobanana-loading').classList.add('show');
+            document.getElementById('nanobanana-result').classList.remove('show');
+
+            try {
+                const payload = mode === 'edit'
+                    ? { mode: 'nano-banana-edit', prompt, image: imageUrl, aspect, noWait: true }
+                    : { mode: 'nano-banana-generate', prompt, aspect, noWait: true };
+
+                const response = await fetch(`${API_BASE}/api/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+
+                if (data.success && data.imageUrl) {
+                    document.getElementById('nanobanana-status').className = 'status success';
+                    document.getElementById('nanobanana-status').textContent = `✅ NanoBanana 完成！价格: ${data.price || '¥2.00'}`;
+                    document.getElementById('nanobanana-output').src = data.imageUrl;
+                    document.getElementById('nanobanana-result').classList.add('show');
+                    saveToGallery('image', data.imageUrl, prompt, 'nano-banana-pro-4k');
+                    return;
+                }
+
+                if (!(data.success && data.taskId)) {
+                    throw new Error(data.error || 'NanoBanana 提交失败');
+                }
+
+                document.getElementById('nanobanana-status').className = 'status pending';
+                document.getElementById('nanobanana-status').textContent = `⏳ NanoBanana 已提交：${data.taskId}，10秒检查一次...`;
+                document.getElementById('nanobanana-result').classList.add('show');
+                await pollNanoBananaStatus(data.taskId);
+            } catch (err) {
+                document.getElementById('nanobanana-status').className = 'status error';
+                document.getElementById('nanobanana-status').textContent = '❌ ' + err.message;
+                document.getElementById('nanobanana-result').classList.add('show');
+            } finally {
+                document.getElementById('nanobanana-loading').classList.remove('show');
+            }
+        }
+
+        async function pollNanoBananaStatus(taskId) {
+            const checkStatus = async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/api/status?jobId=${taskId}&model=nano-banana-pro-4k&type=nanobanana`);
+                    const data = await response.json();
+
+                    if (data.status === 'completed') {
+                        document.getElementById('nanobanana-status').className = 'status success';
+                        document.getElementById('nanobanana-status').textContent = `✅ NanoBanana 完成！价格: ${data.price || '¥2.00'}`;
+                        document.getElementById('nanobanana-output').src = data.imageUrl;
+                        document.getElementById('nanobanana-result').classList.add('show');
+                        saveToGallery('image', data.imageUrl, document.getElementById('nanobanana-prompt').value, 'nano-banana-pro-4k');
+                    } else if (data.status === 'failure' || data.status === 'failed' || data.error) {
+                        throw new Error(data.message || data.error || 'NanoBanana 失败');
+                    } else {
+                        document.getElementById('nanobanana-status').className = 'status pending';
+                        document.getElementById('nanobanana-status').textContent = `⏳ NanoBanana 处理中（任务 ${taskId}），10秒后继续检查...`;
+                        setTimeout(checkStatus, 10000);
+                    }
+                } catch (err) {
+                    document.getElementById('nanobanana-status').className = 'status error';
+                    document.getElementById('nanobanana-status').textContent = '❌ ' + err.message;
+                }
+            };
+            checkStatus();
+        }
+
         async function generateVideo() {
             const prompt = document.getElementById('video-prompt').value;
             const model = document.getElementById('video-model').value;

@@ -1,12 +1,13 @@
 /**
  * GET /api/status?jobId=&model= — Async job status for bltcy.ai
- * Supports Kling, Runway, Wan, and Midjourney
+ * Supports Kling, Runway, Wan, Midjourney, and NanoBanana
  */
 
 const { checkKlingStatus } = require("../generate-kling");
 const { checkRunwayStatus } = require("../generate-runway");
 const { checkCheapVideoStatus } = require("../generate-cheap-video");
 const { checkMJStatus } = require("../generate-midjourney");
+const { checkNanoBananaStatus } = require("../generate-nanobanana");
 
 const BLTCY_API_KEY = process.env.BLTCY_API_KEY || "";
 
@@ -54,6 +55,11 @@ module.exports = async function handler(req, res) {
       if (result && result.success && result.status === "completed") {
         result.price = "¥1.00";
       }
+    } else if (model.includes("nano-banana") || model.includes("nanobanana") || req.query?.type === "nanobanana") {
+      result = await checkNanoBananaStatus(jobId, apiKey);
+      if (result && result.success && result.status === "completed") {
+        result.price = "¥2.00";
+      }
     } else if (model.includes("kling")) {
       result = await checkKlingStatus(jobId, apiKey);
     } else if (model.includes("runway")) {
@@ -74,7 +80,14 @@ module.exports = async function handler(req, res) {
               result.price = "¥1.00";
             }
           } catch {
-            result = await checkCheapVideoStatus(jobId, model, apiKey);
+            try {
+              result = await checkNanoBananaStatus(jobId, apiKey);
+              if (result && result.success && result.status === "completed") {
+                result.price = "¥2.00";
+              }
+            } catch {
+              result = await checkCheapVideoStatus(jobId, model, apiKey);
+            }
           }
         }
       }

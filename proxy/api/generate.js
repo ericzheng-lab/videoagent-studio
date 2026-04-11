@@ -13,6 +13,7 @@ const { generateCheapVideo, checkCheapVideoStatus, CHEAP_VIDEO_MODELS } = requir
 // 新功能适配器
 const { mjImagine, mjUpscale, mjVariation, mjBlend, mjDescribe, checkMJStatus } = require("../generate-midjourney");
 const { mjEdits, mjZoom, mjPan, mjVaryRegion } = require("../generate-midjourney-edits");
+const { nanoBananaGenerate, nanoBananaEdit } = require("../generate-nanobanana");
 const { generateMultiShotVideo, generateSequentialShots } = require("../generate-multishot");
 
 // 工具模块
@@ -51,10 +52,13 @@ const SUPPORTED_MODELS = {
   "mj": "midjourney",
   "mj-fast": "midjourney",
   "mj-turbo": "midjourney",
+
+  // NanoBanana
+  "nano-banana-pro-4k": "nanobanana",
 };
 
 const VIDEO_MODELS = ["kling", "runway", "wan", "cheap-video"];
-const IMAGE_MODELS = ["cheap-image", "midjourney"];
+const IMAGE_MODELS = ["cheap-image", "midjourney", "nanobanana"];
 
 // 工具函数
 function json(res, status, data) {
@@ -85,10 +89,10 @@ module.exports = async function handler(req, res) {
       service: "videoagent-video-studio-proxy",
       version: "3.0.0-bltcy",
       status: "ok",
-      modes: ["text-to-video", "image-to-video", "text-to-image", "reference-to-video", "multi-shot", "mj-imagine", "mj-upscale", "mj-blend", "mj-edits", "mj-zoom", "mj-pan", "mj-vary-region"],
-      features: ["reference-mode", "advanced-params", "style-presets", "multi-shot", "midjourney", "midjourney-edits"],
+      modes: ["text-to-video", "image-to-video", "text-to-image", "reference-to-video", "multi-shot", "mj-imagine", "mj-upscale", "mj-blend", "mj-edits", "mj-zoom", "mj-pan", "mj-vary-region", "nano-banana-generate", "nano-banana-edit"],
+      features: ["reference-mode", "advanced-params", "style-presets", "multi-shot", "midjourney", "midjourney-edits", "nano-banana"],
       videoModels: [...Object.keys(KLING_MODELS), ...Object.keys(RUNWAY_MODELS), ...Object.keys(WAN_MODELS)],
-      imageModels: [...Object.keys(CHEAP_IMAGE_MODELS), "midjourney"],
+      imageModels: [...Object.keys(CHEAP_IMAGE_MODELS), "midjourney", "nano-banana-pro-4k"],
       stylePresets: Object.keys(STYLE_PRESETS),
       note: "Full-featured video/image generation via bltcy.ai",
     });
@@ -154,6 +158,14 @@ module.exports = async function handler(req, res) {
         result = await mjVaryRegion(body, apiKey);
         break;
 
+      // NanoBanana
+      case "nano-banana-generate":
+        result = await nanoBananaGenerate(body, apiKey);
+        break;
+      case "nano-banana-edit":
+        result = await nanoBananaEdit(body, apiKey);
+        break;
+
       // 标准视频生成
       case "text-to-video":
       case "image-to-video":
@@ -182,6 +194,15 @@ async function handleImageGeneration(body, apiKey) {
       prompt: body.prompt,
       aspect: body.aspectRatio || body.aspect || "1:1",
       mode: body.mjMode || "fast",
+    }, apiKey);
+  }
+
+  // NanoBanana 图像
+  if (model === "nano-banana-pro-4k" || model === "nanobanana") {
+    return await nanoBananaGenerate({
+      prompt: body.prompt,
+      aspect: body.aspectRatio || body.aspect || "1:1",
+      noWait: body.noWait || false,
     }, apiKey);
   }
   
