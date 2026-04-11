@@ -36,13 +36,49 @@ async function nanoBananaGenerate(params, apiKey) {
 
   const data = await response.json();
 
-  if (data.code !== 1 && data.code !== undefined) {
-    throw new Error(`NanoBanana Generate failed: ${data.description || JSON.stringify(data)}`);
+  // 调试日志
+  console.log('[NanoBanana] Response:', JSON.stringify(data).slice(0, 500));
+
+  // 检查错误
+  if (data.code !== 1 && data.code !== undefined && data.code !== 0 && data.code !== '0') {
+    throw new Error(`NanoBanana Generate failed: ${data.description || data.message || data.error || JSON.stringify(data)}`);
   }
 
-  // 如果直接返回图片 URL
-  if (data.imageUrl || data.url) {
-    const imageUrl = data.imageUrl || data.url;
+  // 处理多种可能的返回格式
+  // 格式1: 直接返回图片 URL
+  let imageUrl = data.imageUrl || data.url || data.image_url;
+  
+  // 格式2: OpenAI 兼容格式 (data[0].url)
+  if (!imageUrl && data.data && data.data[0]) {
+    imageUrl = data.data[0].url || data.data[0].b64_json;
+  }
+  
+  // 格式3: 嵌套在 result 中
+  if (!imageUrl && data.result) {
+    imageUrl = data.result.url || data.result.imageUrl || data.result.image_url;
+  }
+
+  if (imageUrl) {
+    // 如果是 base64，直接处理
+    if (imageUrl.startsWith('data:image')) {
+      const base64Data = imageUrl.split(',')[1];
+      try {
+        const ossUrl = await uploadImage(base64Data, `nanobanana-${Date.now()}.png`);
+        return {
+          success: true,
+          imageUrl: ossUrl,
+          price: "¥2.00",
+        };
+      } catch (e) {
+        return {
+          success: true,
+          imageUrl,
+          price: "¥2.00",
+          warning: "OSS upload failed",
+        };
+      }
+    }
+    
     // 上传到 OSS
     try {
       const imageResponse = await fetch(imageUrl);
@@ -116,13 +152,46 @@ async function nanoBananaEdit(params, apiKey) {
 
   const data = await response.json();
 
-  if (data.code !== 1 && data.code !== undefined) {
-    throw new Error(`NanoBanana Edit failed: ${data.description || JSON.stringify(data)}`);
+  // 调试日志
+  console.log('[NanoBanana Edit] Response:', JSON.stringify(data).slice(0, 500));
+
+  // 检查错误
+  if (data.code !== 1 && data.code !== undefined && data.code !== 0 && data.code !== '0') {
+    throw new Error(`NanoBanana Edit failed: ${data.description || data.message || data.error || JSON.stringify(data)}`);
   }
 
-  // 如果直接返回图片 URL
-  if (data.imageUrl || data.url) {
-    const imageUrl = data.imageUrl || data.url;
+  // 处理多种可能的返回格式
+  let imageUrl = data.imageUrl || data.url || data.image_url;
+  
+  if (!imageUrl && data.data && data.data[0]) {
+    imageUrl = data.data[0].url || data.data[0].b64_json;
+  }
+  
+  if (!imageUrl && data.result) {
+    imageUrl = data.result.url || data.result.imageUrl || data.result.image_url;
+  }
+
+  if (imageUrl) {
+    // 如果是 base64
+    if (imageUrl.startsWith('data:image')) {
+      const base64Data = imageUrl.split(',')[1];
+      try {
+        const ossUrl = await uploadImage(base64Data, `nanobanana-edit-${Date.now()}.png`);
+        return {
+          success: true,
+          imageUrl: ossUrl,
+          price: "¥2.00",
+        };
+      } catch (e) {
+        return {
+          success: true,
+          imageUrl,
+          price: "¥2.00",
+          warning: "OSS upload failed",
+        };
+      }
+    }
+    
     // 上传到 OSS
     try {
       const imageResponse = await fetch(imageUrl);
@@ -146,9 +215,9 @@ async function nanoBananaEdit(params, apiKey) {
   }
 
   // 如果返回 taskId，需要轮询
-  const taskId = data.result || data.task_id || data.id;
+  const taskId = data.result || data.task_id || data.id || data.taskId;
   if (!taskId) {
-    throw new Error("No taskId returned from NanoBanana Edit");
+    throw new Error(`No taskId returned from NanoBanana Edit. Response: ${JSON.stringify(data).slice(0, 200)}`);
   }
 
   if (noWait) {
