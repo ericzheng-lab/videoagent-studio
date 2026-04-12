@@ -162,14 +162,95 @@ curl -s -X POST ${VIDEO_STUDIO_PROXY_URL}/api/generate \
 
 ## 提示词优化技巧
 
-### 图像提示词结构
+### 基础提示词结构
 ```
 [主体], [细节描述], [风格], [质量词], [光线/氛围]
 ```
 
-### 视频提示词结构
+### 5层影视框架（高质量输出时使用）
+
+当用户需要专业级、电影感的图像或视频时，使用 5层框架构建提示词：
+
+**第1层：基础信息**
+- 场景类型：城市、乡村、室内、室外、科幻、现实、复古、未来、水下、空中
+- 主体内容：人物、动物、物体、风景、机械、抽象、混合物
+- 动作描述：站立、行走、奔跑、飞行、游泳、静止、舞蹈、战斗、变形
+
+**第2层：摄影专业**
+- 相机类型：广角(24mm以下)、标准(35-50mm)、长焦(70mm+)、微距、航拍、斯坦尼康
+- 镜头运动：推(Push)、拉(Pull)、摇(Pan)、移(Truck)、跟(Follow)、升(Dolly Up)、降(Dolly Down)、环绕(Orbit)
+- 拍摄角度：平视(eye-level)、俯视(high angle)、仰视(low angle)、斜视(Dutch angle)、鸟瞰(bird's eye)、蚁视(worm's eye)
+
+**第3层：构图光影**
+- 构图法则：三分法、对称构图、引导线、框架构图、黄金分割、放射状、棋盘式
+- 光线类型：自然光(阳光/月光)、人工光(灯光/烛光)、混合光、环境光、轮廓光
+- 光源方向：顺光(front light)、侧光(side light)、逆光(back light)、顶光(top light)、底光(bottom light)
+
+**第4层：风格质感**
+- 画面风格：电影感、纪录片、动漫风格、油画质感、水彩画、像素风、赛博朋克、蒸汽朋克、废土风
+- 色彩调性：冷色调(蓝/青/紫)、暖色调(橙/红/黄)、高饱和度、低饱和度、黑白电影、双色套色
+- 纹理细节：锐利清晰、柔和梦幻、颗粒质感、丝绸顺滑、磨砂质感、玻璃反光、水面反射
+
+**第5层：氛围情绪**
+- 情绪表达：紧张、放松、欢乐、悲伤、神秘、恐怖、浪漫、史诗、温馨、悬疑、焦虑、希望
+- 氛围渲染：梦幻现实、赛博都市、复古怀旧、自然清新、黑暗压抑、光明希望、混乱秩序、孤独狂欢
+- 整体基调：史诗级、电影级、纪录片感、商业广告、实验艺术、个人表达、短视频风
+
+**5层框架示例：**
 ```
-[场景], [主体动作], [镜头运动], [风格], [质量词]
+第1层：城市夜景，街道上的人物，独自行走
+第2层：手持摄影，跟拍视角，35mm定焦
+第3层：三分法构图，霓虹灯光源，侧逆光，潮湿地面反射
+第4层：赛博朋克风格，高对比度，冷色调，赛博都市质感
+第5层：孤独感，霓虹与雨水的迷幻氛围，电影感
+```
+
+### 多镜头提示词规范（Kling 3.0）
+
+当用户需要多镜头视频时，使用 SHOT 列表格式：
+
+**基础结构：**
+```
+SHOT1
+[镜头类型] + [场景描述] + [主体动作]
+
+SHOT2
+[镜头类型] + [场景描述] + [主体动作]
+
+SHOT3
+[镜头类型] + [场景描述] + [主体动作]
+```
+
+**叙事三段式公式：**
+- SHOT1 → 建立 (Wide/Establishing Shot)：展示环境，交代背景
+- SHOT2 → 聚焦 (Tracking/Close Shot)：跟进动作，推进张力
+- SHOT3 → 高潮 (Epic/Climax Shot)：爆发性结局，情绪顶点
+
+**镜头类型关键词：**
+| 效果 | 关键词 |
+|-----|-------|
+| 建立环境 | Wide shot / Wide establishing shot / Aerial wide |
+| 跟随追踪 | Tracking shot / Following shot / Camera locks behind |
+| 英雄角度 | Low-angle shot / Hero shot / Epic low angle |
+| 特写情绪 | Close-up / Tight close / Beauty shot |
+| 推进悬疑 | Slow push-in / Dolly in / Camera creeps toward |
+| FPV沉浸 | FPV shot / POV shot / Hyper speed FPV |
+| 环绕展示 | Orbit shot / 360 spin / Camera sweeps around |
+| 史诗收尾 | Epic wide / Final hero shot / Grand reveal |
+
+**多镜头示例（神庙逃亡）：**
+```
+SHOT1
+Wide jungle shot, an explorer bursts out of a collapsing stone temple 
+as dust and vines fall around the entrance
+
+SHOT2
+Tracking run shot, giant stone blocks crash behind him 
+as he sprints down ancient stairs.
+
+SHOT3
+Epic wide shot, the temple collapses entirely 
+as he dives into the jungle river below.
 ```
 
 ### 常用增强词
