@@ -877,39 +877,8 @@
             };
             checkStatus();
         }
-            const checkStatus = async () => {
-                try {
-                    const response = await fetch(`${API_BASE}/api/status?jobId=${taskId}&model=midjourney&type=mj`);
-                    const data = await response.json();
 
-                    if (data.status === 'completed') {
-                        document.getElementById('image-status').className = 'status success';
-                        document.getElementById('image-status').textContent = `✅ Midjourney 完成！价格: ${data.price || '¥1.00'}`;
-                        document.getElementById('image-output').src = data.imageUrl;
-                        document.getElementById('image-result').classList.add('show');
-                        currentMJ.taskId = taskId;
-                        currentMJ.buttons = data.buttons || [];
-                        currentMJ.imageUrl = data.imageUrl;
-                        currentMJ.originalUrl = data.originalUrl || data.imageUrl;
-                        renderMJButtons();
-                        saveToGallery('image', data.imageUrl, currentMJ.prompt, 'midjourney');
-                    } else if (data.status === 'failure' || data.status === 'failed' || data.error) {
-                        throw new Error(data.message || data.error || 'Midjourney 生成失败');
-                    } else {
-                        document.getElementById('image-status').className = 'status pending';
-                        document.getElementById('image-status').textContent = `⏳ Midjourney 生成中（任务 ${taskId}），20 秒后继续检查...`;
-                        setTimeout(checkStatus, 20000);
-                    }
-                } catch (err) {
-                    document.getElementById('image-status').className = 'status error';
-                    document.getElementById('image-status').textContent = '❌ ' + err.message;
-                    document.getElementById('image-result').classList.add('show');
-                }
-            };
-            checkStatus();
-        }
-
-        function renderMJButtons() {
+        async function pollMJStatus(taskId) {
             const container = document.getElementById('mj-actions');
             const labels = ['U1','U2','U3','U4','V1','V2','V3','V4','REROLL'];
             container.innerHTML = labels.map(label =>
