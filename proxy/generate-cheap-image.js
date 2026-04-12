@@ -51,8 +51,8 @@ const CHEAP_IMAGE_MODELS = {
   "ideogram-remix": "ideogram-remix-v3",
   
   // OpenAI Image (GPT Image 1, DALL-E 3)
-  "openai-image": "gpt-image-1",
-  "gpt-image": "gpt-image-1",
+  "openai-image": "gpt-image-1.5",
+  "gpt-image": "gpt-image-1.5",
   "gpt-image-1": "gpt-image-1",
   "gpt-image-1.5": "gpt-image-1.5",
   "dall-e": "dall-e-3",
