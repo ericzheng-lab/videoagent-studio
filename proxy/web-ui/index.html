@@ -791,6 +791,34 @@
                     return;
                 }
 
+                // Kling Image 异步轮询
+                if (model.startsWith('kling-image')) {
+                    document.getElementById('image-status').className = 'status pending';
+                    document.getElementById('image-status').textContent = '⏳ Kling Image 提交中...';
+                    document.getElementById('image-result').classList.add('show');
+
+                    const response = await fetch(`${API_BASE}/api/generate`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            mode: 'text-to-image',
+                            prompt,
+                            model,
+                            size
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    if (!(data.success && data.taskId)) {
+                        throw new Error(data.error || 'Kling Image 提交失败');
+                    }
+
+                    document.getElementById('image-status').className = 'status pending';
+                    document.getElementById('image-status').textContent = `⏳ Kling Image 任务已提交：${data.taskId}，每 10 秒检查一次...`;
+                    await pollKlingImageStatus(data.taskId);
+                    return;
+                }
+
                 const response = await fetch(`${API_BASE}/api/generate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -822,7 +850,33 @@
             }
         }
 
-        async function pollMJStatus(taskId) {
+        async function pollKlingImageStatus(taskId) {
+            const checkStatus = async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/api/status?jobId=${taskId}&model=kling-image-v2-1&type=image`);
+                    const data = await response.json();
+
+                    if (data.status === 'completed') {
+                        document.getElementById('image-status').className = 'status success';
+                        document.getElementById('image-status').textContent = `✅ Kling Image 完成！价格: ${data.price || '¥0.15'}`;
+                        document.getElementById('image-output').src = data.imageUrl;
+                        document.getElementById('image-result').classList.add('show');
+                        saveToGallery('image', data.imageUrl, document.getElementById('image-prompt').value, 'kling-image-v2-1');
+                    } else if (data.status === 'failure' || data.status === 'failed' || data.error) {
+                        throw new Error(data.message || data.error || 'Kling Image 生成失败');
+                    } else {
+                        document.getElementById('image-status').className = 'status pending';
+                        document.getElementById('image-status').textContent = `⏳ Kling Image 生成中（任务 ${taskId}），10 秒后继续检查...`;
+                        setTimeout(checkStatus, 10000);
+                    }
+                } catch (err) {
+                    document.getElementById('image-status').className = 'status error';
+                    document.getElementById('image-status').textContent = '❌ ' + err.message;
+                    document.getElementById('image-result').classList.add('show');
+                }
+            };
+            checkStatus();
+        }
             const checkStatus = async () => {
                 try {
                     const response = await fetch(`${API_BASE}/api/status?jobId=${taskId}&model=midjourney&type=mj`);

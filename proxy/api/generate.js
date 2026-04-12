@@ -14,6 +14,7 @@ const { generateCheapVideo, checkCheapVideoStatus, CHEAP_VIDEO_MODELS } = requir
 const { mjImagine, mjUpscale, mjVariation, mjBlend, mjDescribe, checkMJStatus } = require("../generate-midjourney");
 const { mjEdits, mjZoom, mjPan, mjVaryRegion } = require("../generate-midjourney-edits");
 const { nanoBananaGenerate, nanoBananaEdit } = require("../generate-nanobanana");
+const { generateKlingImage, checkKlingImageStatus, KLING_IMAGE_MODELS } = require("../generate-kling-image");
 const { generateMultiShotVideo, generateSequentialShots } = require("../generate-multishot");
 
 // 工具模块
@@ -53,12 +54,21 @@ const SUPPORTED_MODELS = {
   "mj-fast": "midjourney",
   "mj-turbo": "midjourney",
 
+  // Kling Image
+  "kling-image": "kling-image",
+  "kling-image-v1": "kling-image",
+  "kling-image-v1-5": "kling-image",
+  "kling-image-v2": "kling-image",
+  "kling-image-v2-1": "kling-image",
+  "kling-image-2-1": "kling-image",
+  "kling-image-expend": "kling-image",
+
   // NanoBanana
   "nano-banana-pro-4k": "nanobanana",
 };
 
 const VIDEO_MODELS = ["kling", "runway", "wan", "cheap-video"];
-const IMAGE_MODELS = ["cheap-image", "midjourney", "nanobanana"];
+const IMAGE_MODELS = ["cheap-image", "midjourney", "nanobanana", "kling-image"];
 
 // 工具函数
 function json(res, status, data) {
@@ -158,6 +168,11 @@ module.exports = async function handler(req, res) {
         result = await mjVaryRegion(body, apiKey);
         break;
 
+      // Kling Image
+      case "kling-image-generate":
+        result = await generateKlingImage(body, apiKey);
+        break;
+
       // NanoBanana
       case "nano-banana-generate":
         result = await nanoBananaGenerate(body, apiKey);
@@ -197,12 +212,29 @@ async function handleImageGeneration(body, apiKey) {
     }, apiKey);
   }
 
-  // NanoBanana 图像
-  if (model === "nano-banana-pro" || model === "nano-banana-pro-4k" || model === "nanobanana") {
-    return await nanoBananaGenerate({
+  // Kling Image
+  if (model.startsWith("kling-image")) {
+    return await generateKlingImage({
       prompt: body.prompt,
-      aspect: body.aspectRatio || body.aspect || "1:1",
-      noWait: body.noWait || false,
+      model: model,
+      size: body.size || "1024x1024",
+      n: body.n || 1,
+      seed: body.seed,
+      negativePrompt: body.negativePrompt,
+      quality: body.quality,
+    }, apiKey);
+  }
+  
+  // Kling Image
+  if (model.startsWith("kling-image")) {
+    return await generateKlingImage({
+      prompt: body.prompt,
+      model: model,
+      size: body.size || "1024x1024",
+      n: body.n || 1,
+      seed: body.seed,
+      negativePrompt: body.negativePrompt,
+      quality: body.quality,
     }, apiKey);
   }
   
@@ -324,6 +356,9 @@ module.exports.statusHandler = async function(req, res) {
           break;
         case "wan":
           result = await checkWanStatus(taskId, apiKey);
+          break;
+        case "kling-image":
+          result = await checkKlingImageStatus(taskId, apiKey);
           break;
         default:
           // 尝试所有适配器
