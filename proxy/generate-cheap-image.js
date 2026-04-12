@@ -27,6 +27,15 @@ const CHEAP_IMAGE_MODELS = {
   // Recraft (¥0.12)
   "recraft": "recraftv3",
   "recraftv3": "recraftv3",
+
+  // Ideogram (¥0.15-0.25)
+  "ideogram": "ideogram-generate-v3",
+  "ideogram-v3": "ideogram-generate-v3",
+  "ideogram-generate": "ideogram-generate-v3",
+  "ideogram-generate-v3": "ideogram-generate-v3",
+  "ideogram-edit": "ideogram-edit-v3",
+  "ideogram-reframe": "ideogram-reframe-v3",
+  "ideogram-remix": "ideogram-remix-v3",
   
   // 即梦/Seedance (¥0.1-0.15)
   "seedream": "seedream-3.0",
