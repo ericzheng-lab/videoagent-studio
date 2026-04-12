@@ -253,6 +253,89 @@ Epic wide shot, the temple collapses entirely
 as he dives into the jungle river below.
 ```
 
+### 高级多镜头示例（来自实践测试）
+
+**4-Multi-Shot：角色一致性多镜头**
+```
+Using the provided image of the warrior as the visual reference, generate a cinematic, photorealistic video composed of four distinct shots with clear cuts.
+
+The warrior must remain the exact same character throughout all shots: same face, same eyes, same facial hair, same skin texture, same body proportions and musculature, same armor, same helmet with red plume, same shield, same spear, same sneakers. No identity drift. No costume changes unless explicitly described.
+
+Shot 1: Extreme close-up on the warrior's eyes. A fast, aggressive snap zoom directly into his eyes, sharp and mechanical. Eyes intense, focused, unblinking. Minimal movement except subtle breathing and micro facial tension. Background fully blurred. Cut.
+
+Shot 2: Wide shot of the warrior leaping from a large ancient Greek marble statue. The statue is classical, monumental, and weathered. The warrior launches forward and performs one clean forward flip in the air. Movement is athletic, controlled, and physically believable. The camera follows the arc of his motion smoothly. Cut.
+
+Shot 3: Side tracking shot of the warrior in a full-speed sprint along an ancient Greek promenade. Stone walkways, columns, and an open horizon suggest a historic coastal city. The camera tracks perfectly alongside him. The warrior remains sharp while the environment blurs heavily, emphasizing speed and power. Cut.
+
+Shot 4: Tight close-up on the warrior's face with the helmet still on. The helmet, plume, and all armor remain unchanged. The warrior is now still, resting after the run. His breathing is deep and steady, visible through subtle chest and facial movement. Sweat, skin texture, and fatigue are clearly visible around the eyes and face. He looks forward with a calm, focused gaze — composed, controlled, fully present. No dialogue, no exaggerated expression. Background softly blurred, maintaining the same ancient Greek city environment.
+
+All shots share the same cinematic language: photorealistic realism, shallow depth of field, cinematic lighting, subtle film grain. Consistent color palette and lighting across shots. Clear cuts between shots. No stylization. No illustration.
+```
+
+**5-Camera Control & Motion Language：连续镜头运动**
+```
+Cinematic, photorealistic video. Use the provided image of the tortoise as the first frame. One single continuous shot. No cuts. No fades. No transitions.
+
+Subject behavior (constant and uninterrupted): From the very first frame, the tortoise walks forward at a constant, very slow pace, moving to the right side of the frame. Its walking speed is uniform and unchanging: no stopping, no acceleration, no deceleration. The movement is calm, grounded, and steady, like a system moving at a fixed speed. While walking, the tortoise blinks slowly and regularly. The blinking rhythm remains consistent throughout the entire shot. No other expressive movement.
+
+Camera behavior (single continuous motion): The camera maintains a constant spatial relationship to the tortoise while it walks. While the tortoise continues moving forward, the camera performs a continuous leftward hero orbit around the tortoise: the camera begins at a side-on tracking position, moves smoothly around the tortoise, passes behind it, continues the arc, and naturally arrives in front of the tortoise. This orbit is one uninterrupted motion, not divided into stages. The camera moves faster than the tortoise, allowing it to complete the orbit while the tortoise keeps walking at the same slow pace. Without stopping or cutting, the orbit naturally tightens into a push-in as part of the same motion. The camera closes distance smoothly while completing the orbit. The shot ends in an extreme close-up of the tortoise's face: eyes, skin texture, and slow blinking filling the frame. At no point does the camera cut, fade, pause, or reset.
+
+Environment (locked and continuous): The running track passes through wide, open green fields with tall grass. High, distant mountains sit on the horizon. Clear blue sky. No buildings. No stadiums. No modern structures. The environment remains visually continuous and unchanged throughout the shot.
+
+Visual language: Natural daylight. Cinematic lighting. Shallow depth of field. Subtle film grain. Photorealistic realism. No stylization. No illustration. No added elements.
+```
+
+**6-Character Expressiveness：角色表情和口型同步**
+```
+Cinematic, photorealistic video. Use the provided image as the first frame. One continuous shot. No cuts.
+
+Camera: The camera is mounted on a tripod and remains completely static. Medium close-up interview framing. The character is centered and facing the camera.
+
+Scene: The warrior sits in the spectator stands beside a running track. Behind him are the red–orange track, open green fields, and distant mountains. Natural daylight.
+
+Performance: The warrior looks directly into the camera. He begins speaking with strong, almost exaggerated confidence, as if convincing himself more than the viewer.
+
+Dialogue: "In the end, I'm going to beat him. I'm the fastest man alive!" He stops. There is a short pause. During the pause, he breathes, and something shifts. The confidence starts to feel less certain. He breaks eye contact, looking slightly down and to the side, thinking. Then he speaks again, more quietly, almost to himself, with confusion and frustration: "How is it possible that I can't outrun this tortoise... even though I keep trying, endlessly?" Another brief pause. He suddenly realizes he is still being filmed. He looks back at the camera. Straightens slightly. A small, forced smile appears — polite, controlled, not fully sincere. He holds the smile for a moment. No more dialogue.
+
+Style: Photorealistic realism. Natural light. Shallow depth of field. Subtle film grain.
+```
+
+**7-Complex Scene Understanding：复杂场景理解**
+```
+Cinematic, photorealistic video. One continuous scene. No cuts.
+
+The camera is completely static on a tripod. No pan, no tilt, no zoom, no tracking. The framing remains unchanged for the entire shot.
+
+Scene setup (opening frame): On a red–orange running track stand three main subjects: Left: a knight wearing full silver armor acting as the race starter, one arm raised. Center foreground: a tortoise wearing white sneakers and a white sweat headband. Right: a muscular male warrior wearing a bronze helmet with a red plume, carrying a shield and spear, and modern sneakers. Behind them are large, open spectator stands. Two distant spectator groups are visible: A family of tortoises holding a handmade sign reading "Slow & Steady". A group of Greek warriors holding a banner reading "FASTEST MAN ALIVE".
+
+Action sequence (continuous, layered): The knight drops his raised hand sharply downward, clearly signaling the start of the race. Only after the hand has fully dropped, the tortoise begins walking forward along the track. The tortoise's movement is extremely slow, steady, and constant: no hesitation, no acceleration, no stopping, no change in direction. The knight and the warrior remain completely still, standing upright. Their bodies stay neutral. Their heads and eyes track the tortoise, following its slow movement. As the tortoise continues, it gradually moves straight to the right until it goes out of the frame.
+
+Background reactions (timed and restrained): The Greek warriors in the stands do not react immediately. After a few seconds, they lower their banner in a simple, neutral motion, holding it down quietly. No dramatic gestures. The tortoise family slowly and gently waves their "Slow & Steady" sign, calmly following the tortoise with their gaze. Their movement is minimal and unhurried. All background figures remain readable, stable, and spatially consistent.
+
+Dialogue timing (critical): No dialogue occurs while the tortoise is visible in frame. Only after the tortoise has fully exited the frame does the dialogue begin. The warrior turns his head slightly toward the knight and asks, in English: "I can start now?" The knight looks back at him and replies calmly: "Not yet." Lip sync must align naturally with the spoken words.
+
+Environment & style: Open landscape with green fields and distant mountains. Natural daylight. Photorealistic realism. Cinematic lighting. Subtle film grain.
+```
+
+**8-Physical Accuracy & Causality：物理准确性和因果性**
+```
+Cinematic, photorealistic video. One continuous scene. No cuts.
+
+Scene: A muscular male warrior is running at high speed along a red–orange running track. He wears a bronze Greek helmet with a red plume, carries a round bronze shield and a spear, and wears modern running sneakers. His sprint is fast, heavy, and athletic. Stride length, arm swing, and body posture show strong momentum and realistic effort.
+
+Action (physical causality test): Suddenly, the warrior stops abruptly. His feet plant forcefully into the track. Inertia must be clearly visible: The upper body continues moving forward for a brief moment after the feet stop. The torso leans ahead of the legs. The arms and shield swing forward naturally due to momentum. The center of mass shifts before balance is recovered. There is no instant freeze. The stop unfolds over time as the body absorbs momentum.
+
+Shield impact: As part of the stop, the warrior slams his shield downward onto the track. The shield: Moves downward under force. Makes clear contact with the ground. Reacts physically: a small bounce, tilt, or scrape is visible. Comes to rest naturally due to gravity and friction. The shield must not float, snap, or reset position.
+
+Recovery: After the stop and shield impact: The warrior stabilizes his stance. The body straightens gradually. Arm motion settles. Weight redistributes evenly. The final pose is stable and grounded, clearly resulting from the prior motion.
+
+Camera: The camera is completely static on a tripod. No pan, no tilt, no zoom, no tracking.
+
+Environment: The running track passes through open green fields with distant mountains. Natural daylight. No buildings, no stadiums, no modern structures.
+
+Style & constraints: Photorealistic realism. Believable physics. Clear cause → effect. No teleportation. No reverse motion. No stylization.
+```
+
 ### 常用增强词
 - **质量**: 4K, highly detailed, professional, masterpiece
 - **风格**: cinematic lighting, anime style, watercolor, photorealistic
