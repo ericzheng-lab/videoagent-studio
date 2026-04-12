@@ -198,7 +198,7 @@ async function handleImageGeneration(body, apiKey) {
   }
 
   // NanoBanana 图像
-  if (model === "nano-banana-pro-4k" || model === "nanobanana") {
+  if (model === "nano-banana-pro" || model === "nano-banana-pro-4k" || model === "nanobanana") {
     return await nanoBananaGenerate({
       prompt: body.prompt,
       aspect: body.aspectRatio || body.aspect || "1:1",

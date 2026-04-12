@@ -1,9 +1,10 @@
 /**
- * 便宜图像生成适配器 (Flux / Stable Diffusion / Wanx-turbo)
+ * 便宜图像生成适配器 (Flux / Stable Diffusion / Wanx-turbo / Ideogram / Recraft)
  * 支持 bltcy.ai 上的经济型图像模型
  */
 
 const CHEAP_IMAGE_BASE_URL = "https://api.bltcy.ai/v1";
+const { uploadImage } = require('./image-upload');
 
 // 便宜图像模型映射 - 基于 BLTCY 文档
 const CHEAP_IMAGE_MODELS = {
@@ -11,6 +12,11 @@ const CHEAP_IMAGE_MODELS = {
   "flux": "flux",
   "flux-dev": "flux-dev",
   "flux-schnell": "flux-schnell",
+  "flux-pro": "flux-pro",
+  "flux-2-dev": "flux-2-dev",
+  "flux-2-flex": "flux-2-flex",
+  "flux-2-max": "flux-2-max",
+  "flux-2-pro": "flux-2-pro",
   
   // Stable Diffusion (¥0.01)
   "sd": "stable-diffusion",
@@ -92,6 +98,13 @@ async function generateCheapImage(params, apiKey) {
     body.negative_prompt = negativePrompt;
   }
 
+  // 调试日志
+  console.log('[generateCheapImage] API Key present:', !!apiKey);
+  console.log('[generateCheapImage] API Key length:', apiKey ? apiKey.length : 0);
+  console.log('[generateCheapImage] Endpoint:', endpoint);
+  console.log('[generateCheapImage] Model:', imageModel);
+  console.log('[generateCheapImage] Body:', JSON.stringify(body));
+
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -101,16 +114,17 @@ async function generateCheapImage(params, apiKey) {
     body: JSON.stringify(body),
   });
 
+  console.log('[generateCheapImage] Response status:', response.status);
+
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || `Image API error: ${response.status}`);
+    const error = await response.text();
+    console.error('[generateCheapImage] Error response:', error);
+    throw new Error(`Image API error: ${response.status} - ${error}`);
   }
 
-const { uploadImage } = require('./image-upload');
-
-// ... existing code ...
-
   const data = await response.json();
+
+  console.log('[generateCheapImage] Response data:', JSON.stringify(data).slice(0, 500));
 
   // OpenAI 格式返回 (bltcy.ai 返回的是 base64 数据)
   if (data.data && data.data[0]) {
