@@ -43,6 +43,19 @@ const CHEAP_IMAGE_MODELS = {
   "ideogram-reframe": "ideogram-reframe-v3",
   "ideogram-remix": "ideogram-remix-v3",
   
+  // OpenAI Image (GPT Image 1, DALL-E 3)
+  "openai-image": "gpt-image-1",
+  "gpt-image": "gpt-image-1",
+  "gpt-image-1": "gpt-image-1",
+  "gpt-image-1.5": "gpt-image-1.5",
+  "dall-e": "dall-e-3",
+  "dall-e-3": "dall-e-3",
+
+  // Seedream 5 (豆包即梦 5.0)
+  "seedream-5": "doubao-seedream-3-0-t2i-250415",
+  "seedream-5.0": "doubao-seedream-3-0-t2i-250415",
+  "doubao-seedream-5": "doubao-seedream-3-0-t2i-250415",
+
   // 即梦/Seedance (¥0.1-0.15)
   "seedream": "seedream-3.0",
   "seedream-3.0": "seedream-3.0",
