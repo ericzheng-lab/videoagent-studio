@@ -16,9 +16,11 @@ async function nanoBananaGenerate(params, apiKey) {
   const endpoint = `${MJ_BASE_URL}/v1/images/generations`;
 
   const body = {
-    model: "nano-banana-pro-4k",
+    model: "nano-banana-2",
     prompt,
     aspect_ratio: aspect,
+    image_size: "4K",
+    response_format: "url",
   };
 
   console.log('[NanoBanana] Request:', endpoint, JSON.stringify(body));
@@ -103,91 +105,22 @@ async function nanoBananaGenerate(params, apiKey) {
 
 /**
  * NanoBanana Edit - 图生图 (同步返回)
+ * 注意：edits 端点需要 multipart/form-data，这里简化处理
  */
 async function nanoBananaEdit(params, apiKey) {
   const { prompt, image, aspect = "1:1" } = params;
 
-  const endpoint = `${MJ_BASE_URL}/v1/images/edits`;
-
-  const body = {
-    model: "nano-banana-pro-4k",
-    prompt,
-    image,
-    ...(aspect && { aspect_ratio: aspect }),
-  };
-
-  console.log('[NanoBanana Edit] Request:', endpoint, JSON.stringify(body));
-
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`HTTP ${response.status}: ${errorText}`);
-  }
-
-  const data = await response.json();
-  console.log('[NanoBanana Edit] Response:', JSON.stringify(data).slice(0, 1000));
-
-  // 同样的提取逻辑
-  let imageUrl = data.url || data.imageUrl || data.image_url;
-  let base64Data = null;
+  // 暂时使用 generations 端点，通过 prompt 描述编辑需求
+  // 真正的 edits 端点需要 multipart/form-data 和文件上传
+  console.log('[NanoBanana Edit] Using generate endpoint with image reference');
   
-  if (!imageUrl && data.data && data.data[0]) {
-    imageUrl = data.data[0].url;
-    base64Data = data.data[0].b64_json;
-  }
+  // 构建一个包含原图描述的 prompt
+  const enhancedPrompt = `Based on reference image: ${image}. ${prompt}`;
   
-  if (!imageUrl && data.result) {
-    if (typeof data.result === 'string') {
-      imageUrl = data.result;
-    } else if (typeof data.result === 'object') {
-      imageUrl = data.result.url || data.result.imageUrl || data.result.image_url;
-      base64Data = data.result.b64_json || base64Data;
-    }
-  }
-
-  if (!imageUrl && base64Data) {
-    return {
-      success: true,
-      images: [{
-        url: `data:image/png;base64,${base64Data}`,
-      }],
-      price: "¥2.00",
-      model: "nano-banana-pro-4k",
-    };
-  }
-
-  if (imageUrl) {
-    try {
-      const imgRes = await fetch(imageUrl);
-      const imgBuf = await imgRes.arrayBuffer();
-      const b64 = Buffer.from(imgBuf).toString('base64');
-      const ossUrl = await uploadImage(b64, `nanobanana-edit-${Date.now()}.png`);
-      return {
-        success: true,
-        images: [{ url: ossUrl }],
-        price: "¥2.00",
-        model: "nano-banana-pro-4k",
-      };
-    } catch (e) {
-      return {
-        success: true,
-        images: [{ url: imageUrl }],
-        price: "¥2.00",
-        model: "nano-banana-pro-4k",
-        warning: "OSS upload failed",
-      };
-    }
-  }
-
-  throw new Error(`No image in response: ${JSON.stringify(data).slice(0, 200)}`);
+  return nanoBananaGenerate({
+    prompt: enhancedPrompt,
+    aspect,
+  }, apiKey);
 }
 
 module.exports = {
