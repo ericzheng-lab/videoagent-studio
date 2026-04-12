@@ -16,10 +16,9 @@ async function nanoBananaGenerate(params, apiKey) {
   const endpoint = `${MJ_BASE_URL}/v1/images/generations`;
 
   const body = {
-    model: "nano-banana-2",
+    model: "gemini-3.1-flash-image-preview",
     prompt,
     aspect_ratio: aspect,
-    image_size: "4K",
     response_format: "url",
   };
 
