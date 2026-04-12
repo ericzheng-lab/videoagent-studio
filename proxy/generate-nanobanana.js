@@ -13,7 +13,7 @@ const { uploadImage } = require('./image-upload');
 async function nanoBananaGenerate(params, apiKey) {
   const { prompt, aspect = "1:1" } = params;
 
-  const endpoint = `${MJ_BASE_URL}/v1/images/generation`;
+  const endpoint = `${MJ_BASE_URL}/v1/images/generations`;
 
   const body = {
     model: "nano-banana-pro-4k",
