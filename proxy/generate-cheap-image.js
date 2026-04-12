@@ -34,6 +34,13 @@ const CHEAP_IMAGE_MODELS = {
   "recraft": "recraftv3",
   "recraftv3": "recraftv3",
 
+  // Kling Image (¥0.15-0.25)
+  "kling-image": "kling-image",
+  "kling-image-v1": "kling-image-v1",
+  "kling-image-v1-5": "kling-image-v1-5",
+  "kling-image-v2": "kling-image-v2",
+  "kling-image-v2-1": "kling-image-v2-1",
+
   // Ideogram (¥0.15-0.25)
   "ideogram": "ideogram-generate-v3",
   "ideogram-v3": "ideogram-generate-v3",
