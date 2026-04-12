@@ -15,6 +15,17 @@ const { mjImagine, mjUpscale, mjVariation, mjBlend, mjDescribe, checkMJStatus } 
 const { mjEdits, mjZoom, mjPan, mjVaryRegion } = require("../generate-midjourney-edits");
 const { nanoBananaGenerate, nanoBananaEdit } = require("../generate-nanobanana");
 const { generateKlingImage, checkKlingImageStatus, KLING_IMAGE_MODELS } = require("../generate-kling-image");
+const { 
+  generateKlingVideo: klingStudioVideo,
+  generateKlingImage: klingStudioImage, 
+  generateKlingVideoToAudio,
+  generateKlingLipSync,
+  checkKlingStatus: klingStudioCheckStatus,
+  KLING_VIDEO_MODELS,
+  KLING_IMAGE_MODELS: KLING_STUDIO_IMAGE_MODELS,
+  KLING_AUDIO_MODELS,
+  KLING_AVATAR_MODELS
+} = require("../kling-studio");
 const { generateMultiShotVideo, generateSequentialShots } = require("../generate-multishot");
 
 // 工具模块
@@ -62,6 +73,15 @@ const SUPPORTED_MODELS = {
   "kling-image-v2-1": "kling-image",
   "kling-image-2-1": "kling-image",
   "kling-image-expend": "kling-image",
+
+  // Kling Audio
+  "kling-video-to-audio": "kling-audio",
+  "kling-text-to-audio": "kling-audio",
+  "kling-sound": "kling-audio",
+
+  // Kling Avatar/Lip-sync
+  "kling-lip-sync": "kling-avatar",
+  "kling-meta-human": "kling-avatar",
 
   // NanoBanana
   "nano-banana-pro-4k": "nanobanana",
@@ -168,9 +188,18 @@ module.exports = async function handler(req, res) {
         result = await mjVaryRegion(body, apiKey);
         break;
 
-      // Kling Image
+      // Kling Studio
+      case "kling-video-generate":
+        result = await klingStudioVideo(body, apiKey);
+        break;
       case "kling-image-generate":
-        result = await generateKlingImage(body, apiKey);
+        result = await klingStudioImage(body, apiKey);
+        break;
+      case "kling-video-to-audio":
+        result = await generateKlingVideoToAudio(body, apiKey);
+        break;
+      case "kling-lip-sync":
+        result = await generateKlingLipSync(body, apiKey);
         break;
 
       // NanoBanana
@@ -212,22 +241,9 @@ async function handleImageGeneration(body, apiKey) {
     }, apiKey);
   }
 
-  // Kling Image
+  // Kling Image (via Kling Studio)
   if (model.startsWith("kling-image")) {
-    return await generateKlingImage({
-      prompt: body.prompt,
-      model: model,
-      size: body.size || "1024x1024",
-      n: body.n || 1,
-      seed: body.seed,
-      negativePrompt: body.negativePrompt,
-      quality: body.quality,
-    }, apiKey);
-  }
-  
-  // Kling Image
-  if (model.startsWith("kling-image")) {
-    return await generateKlingImage({
+    return await klingStudioImage({
       prompt: body.prompt,
       model: model,
       size: body.size || "1024x1024",
@@ -358,12 +374,21 @@ module.exports.statusHandler = async function(req, res) {
           result = await checkWanStatus(taskId, apiKey);
           break;
         case "kling-image":
-          result = await checkKlingImageStatus(taskId, apiKey);
+          result = await klingStudioCheckStatus(taskId, apiKey, "image");
+          break;
+        case "kling-audio":
+          result = await klingStudioCheckStatus(taskId, apiKey, "audio");
+          break;
+        case "kling-avatar":
+          result = await klingStudioCheckStatus(taskId, apiKey, "avatar");
           break;
         default:
           // 尝试所有适配器
           const adapters = [
             ['kling', checkKlingStatus],
+            ['kling-image', () => klingStudioCheckStatus(taskId, apiKey, "image")],
+            ['kling-audio', () => klingStudioCheckStatus(taskId, apiKey, "audio")],
+            ['kling-avatar', () => klingStudioCheckStatus(taskId, apiKey, "avatar")],
             ['runway', checkRunwayStatus],
             ['wan', checkWanStatus]
           ];

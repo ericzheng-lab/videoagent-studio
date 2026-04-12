@@ -283,6 +283,7 @@
 
         <div class="tabs">
             <button class="tab active" data-tab="mjstudio" onclick="switchTab('mjstudio', this)">🎛️ MJ Studio</button>
+            <button class="tab" data-tab="kling" onclick="switchTab('kling', this)">🎬 Kling Studio</button>
             <button class="tab" data-tab="image" onclick="switchTab('image', this)">🖼️ 图像生成</button>
             <button class="tab" data-tab="nanobanana" onclick="switchTab('nanobanana', this)">🍌 NanoBanana</button>
             <button class="tab" data-tab="edit" onclick="switchTab('edit', this)">✏️ MJ 编辑</button>
@@ -362,6 +363,121 @@
                     <button class="mini-btn" onclick="sendCurrentMJToEdit()">✏️ 把当前结果带去 MJ 编辑</button>
                     <button class="mini-btn" onclick="useCurrentMJInEdit('在画面外围扩展更多环境细节，保持原风格')">🪄 扩图编辑</button>
                     <button class="mini-btn" onclick="useCurrentMJInEdit('在保持主体不变的前提下，增加更多场景元素和层次')">➕ 加元素编辑</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kling Studio 面板 -->
+        <div id="kling-panel" class="panel">
+            <div class="helper-card">
+                <h3>🎬 Kling Studio - 可灵 AI 统一工作台</h3>
+                <p>一站式使用 Kling 所有功能：<strong>视频生成</strong>（文生视频、图生视频）、<strong>图像生成</strong>、<strong>视频转音频</strong>、<strong>对口型</strong>。支持从作品库直接选择素材。</p>
+                <div class="quick-actions">
+                    <button class="mini-btn" onclick="switchKlingMode('video')">🎬 视频生成</button>
+                    <button class="mini-btn" onclick="switchKlingMode('image')">🖼️ 图像生成</button>
+                    <button class="mini-btn" onclick="switchKlingMode('audio')">🔊 视频转音频</button>
+                    <button class="mini-btn" onclick="switchKlingMode('lip')">👄 对口型</button>
+                </div>
+            </div>
+
+            <!-- Kling 模式选择 -->
+            <div class="form-group">
+                <label>选择功能</label>
+                <select id="kling-mode" onchange="onKlingModeChange()">
+                    <option value="video-t2v">🎬 文生视频 (T2V)</option>
+                    <option value="video-i2v">🖼️ 图生视频 (I2V)</option>
+                    <option value="image">🖼️ 图像生成</option>
+                    <option value="video-to-audio">🔊 视频转音频</option>
+                    <option value="lip-sync">👄 对口型 / 数字人</option>
+                </select>
+            </div>
+
+            <!-- 提示词 -->
+            <div class="form-group">
+                <label id="kling-prompt-label">提示词 (Prompt)</label>
+                <textarea id="kling-prompt" placeholder="描述你想要生成的内容..."></textarea>
+            </div>
+
+            <!-- 媒体输入（图生视频 / 对口型） -->
+            <div class="form-group" id="kling-media-group" style="display:none;">
+                <label id="kling-media-label">图片 URL</label>
+                <input id="kling-media-url" placeholder="输入图片 URL，或从作品库选择">
+                <div class="quick-actions" style="margin-top:8px;">
+                    <button class="mini-btn" onclick="loadFromGallery('kling-media-url', 'image')">📁 从作品库选择图片</button>
+                </div>
+            </div>
+
+            <!-- 视频输入（视频转音频 / 视频延长） -->
+            <div class="form-group" id="kling-video-group" style="display:none;">
+                <label>视频 URL</label>
+                <input id="kling-video-url" placeholder="输入视频 URL，或从作品库选择">
+                <div class="quick-actions" style="margin-top:8px;">
+                    <button class="mini-btn" onclick="loadFromGallery('kling-video-url', 'video')">📁 从作品库选择视频</button>
+                </div>
+            </div>
+
+            <!-- 音频输入（对口型） -->
+            <div class="form-group" id="kling-audio-group" style="display:none;">
+                <label>音频 URL</label>
+                <input id="kling-audio-url" placeholder="输入音频 URL">
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label>模型</label>
+                    <select id="kling-model">
+                        <option value="kling-v2-6">Kling V2.6 <span class="price-tag">¥2.50</span></option>
+                        <option value="kling-o1">Kling O1 <span class="price-tag">¥0.80</span></option>
+                        <option value="kling-v2-5-turbo">Kling V2.5 Turbo <span class="price-tag">¥1.50</span></option>
+                        <option value="kling-v2-1">Kling V2.1 <span class="price-tag">¥2.00</span></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>画面比例</label>
+                    <select id="kling-aspect">
+                        <option value="16:9">16:9 横屏</option>
+                        <option value="9:16">9:16 竖屏</option>
+                        <option value="1:1">1:1 方形</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label>时长</label>
+                    <select id="kling-duration">
+                        <option value="5">5 秒</option>
+                        <option value="10">10 秒</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>运镜控制</label>
+                    <select id="kling-camera">
+                        <option value="">无</option>
+                        <option value="zoom_in">推进</option>
+                        <option value="zoom_out">拉远</option>
+                        <option value="pan_left">左移</option>
+                        <option value="pan_right">右移</option>
+                        <option value="tilt_up">上移</option>
+                        <option value="tilt_down">下移</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="generate-btn" onclick="generateKling()">🚀 提交 Kling 任务</button>
+
+            <div class="loading" id="kling-loading">
+                <div class="spinner"></div>
+                <p>正在提交 Kling 任务...</p>
+            </div>
+
+            <div class="result" id="kling-result">
+                <div class="status" id="kling-status"></div>
+                <div id="kling-output-container"></div>
+                <div class="quick-actions" id="kling-follow-actions" style="display:none; margin-top:12px;">
+                    <button class="mini-btn" onclick="useKlingResultForAudio()">🔊 基于此视频生成音频</button>
+                    <button class="mini-btn" onclick="useKlingResultForLipSync()">👄 基于此视频做对口型</button>
+                    <button class="mini-btn" onclick="extendKlingVideo()">⏱️ 延长此视频</button>
                 </div>
             </div>
         </div>
@@ -1218,6 +1334,353 @@
             document.getElementById('edit-image-url').value = imageUrl;
             switchTab('edit', document.querySelector('.tab[data-tab="edit"]'));
             document.getElementById('edit-prompt').focus();
+        }
+
+        // ==================== Kling Studio 功能 ====================
+        let klingState = { taskId: null, resultUrl: null, resultType: null };
+
+        function onKlingModeChange() {
+            const mode = document.getElementById('kling-mode').value;
+            const mediaGroup = document.getElementById('kling-media-group');
+            const videoGroup = document.getElementById('kling-video-group');
+            const audioGroup = document.getElementById('kling-audio-group');
+            const promptLabel = document.getElementById('kling-prompt-label');
+            const modelSelect = document.getElementById('kling-model');
+            const aspectSelect = document.getElementById('kling-aspect');
+            const durationSelect = document.getElementById('kling-duration');
+            const cameraSelect = document.getElementById('kling-camera');
+
+            // 隐藏所有特定输入
+            mediaGroup.style.display = 'none';
+            videoGroup.style.display = 'none';
+            audioGroup.style.display = 'none';
+
+            // 根据模式显示对应输入
+            switch(mode) {
+                case 'video-t2v':
+                    promptLabel.textContent = '提示词 (Prompt)';
+                    modelSelect.innerHTML = `
+                        <option value="kling-v2-6">Kling V2.6 <span class="price-tag">¥2.50</span></option>
+                        <option value="kling-o1">Kling O1 <span class="price-tag">¥0.80</span></option>
+                        <option value="kling-v2-5-turbo">Kling V2.5 Turbo <span class="price-tag">¥1.50</span></option>
+                    `;
+                    aspectSelect.disabled = false;
+                    durationSelect.disabled = false;
+                    cameraSelect.disabled = false;
+                    break;
+                case 'video-i2v':
+                    promptLabel.textContent = '提示词 (Prompt)';
+                    mediaGroup.style.display = 'block';
+                    document.getElementById('kling-media-label').textContent = '图片 URL';
+                    modelSelect.innerHTML = `
+                        <option value="kling-v2-6">Kling V2.6 <span class="price-tag">¥2.50</span></option>
+                        <option value="kling-o1">Kling O1 <span class="price-tag">¥0.80</span></option>
+                    `;
+                    aspectSelect.disabled = false;
+                    durationSelect.disabled = false;
+                    cameraSelect.disabled = false;
+                    break;
+                case 'image':
+                    promptLabel.textContent = '提示词 (Prompt)';
+                    modelSelect.innerHTML = `
+                        <option value="kling-image-v2-1">Kling Image 2.1 <span class="price-tag">¥0.15</span></option>
+                        <option value="kling-image-v2">Kling Image V2 <span class="price-tag">¥0.15</span></option>
+                    `;
+                    aspectSelect.disabled = false;
+                    durationSelect.disabled = true;
+                    cameraSelect.disabled = true;
+                    break;
+                case 'video-to-audio':
+                    promptLabel.textContent = '音频描述 (可选)';
+                    videoGroup.style.display = 'block';
+                    modelSelect.innerHTML = `
+                        <option value="kling-video-to-audio">Video-to-Audio <span class="price-tag">¥0.50</span></option>
+                    `;
+                    aspectSelect.disabled = true;
+                    durationSelect.disabled = true;
+                    cameraSelect.disabled = true;
+                    break;
+                case 'lip-sync':
+                    promptLabel.textContent = '描述 (可选)';
+                    mediaGroup.style.display = 'block';
+                    audioGroup.style.display = 'block';
+                    document.getElementById('kling-media-label').textContent = '人物图片或视频 URL';
+                    modelSelect.innerHTML = `
+                        <option value="kling-lip-sync">Lip Sync <span class="price-tag">¥1.00</span></option>
+                    `;
+                    aspectSelect.disabled = true;
+                    durationSelect.disabled = true;
+                    cameraSelect.disabled = true;
+                    break;
+            }
+        }
+
+        function switchKlingMode(mode) {
+            document.getElementById('kling-mode').value = mode;
+            onKlingModeChange();
+        }
+
+        async function generateKling() {
+            const mode = document.getElementById('kling-mode').value;
+            const prompt = document.getElementById('kling-prompt').value;
+            const model = document.getElementById('kling-model').value;
+            const aspectRatio = document.getElementById('kling-aspect').value;
+            const duration = document.getElementById('kling-duration').value;
+            const cameraMotion = document.getElementById('kling-camera').value;
+            const mediaUrl = document.getElementById('kling-media-url')?.value;
+            const videoUrl = document.getElementById('kling-video-url')?.value;
+            const audioUrl = document.getElementById('kling-audio-url')?.value;
+
+            // 验证输入
+            if (mode === 'video-to-audio' && !videoUrl) {
+                alert('请输入视频 URL');
+                return;
+            }
+            if (mode === 'lip-sync' && !mediaUrl) {
+                alert('请输入图片或视频 URL');
+                return;
+            }
+            if (mode === 'lip-sync' && !audioUrl) {
+                alert('请输入音频 URL');
+                return;
+            }
+
+            document.getElementById('kling-loading').classList.add('show');
+            document.getElementById('kling-result').classList.remove('show');
+            document.getElementById('kling-follow-actions').style.display = 'none';
+
+            try {
+                let payload = { model };
+                let endpoint = '';
+
+                switch(mode) {
+                    case 'video-t2v':
+                        endpoint = 'kling-video-generate';
+                        payload = {
+                            mode: 'text-to-video',
+                            prompt,
+                            model,
+                            aspectRatio,
+                            duration: parseInt(duration),
+                            camera_motion: cameraMotion || undefined
+                        };
+                        break;
+                    case 'video-i2v':
+                        endpoint = 'kling-video-generate';
+                        payload = {
+                            mode: 'image-to-video',
+                            prompt,
+                            model,
+                            imageUrl: mediaUrl,
+                            aspectRatio,
+                            duration: parseInt(duration),
+                            camera_motion: cameraMotion || undefined
+                        };
+                        break;
+                    case 'image':
+                        endpoint = 'kling-image-generate';
+                        payload = {
+                            prompt,
+                            model,
+                            size: aspectRatio === '9:16' ? '1024x1536' : aspectRatio === '16:9' ? '1536x1024' : '1024x1024'
+                        };
+                        break;
+                    case 'video-to-audio':
+                        endpoint = 'kling-video-to-audio';
+                        payload = {
+                            videoUrl,
+                            prompt: prompt || 'generate matching sound effects'
+                        };
+                        break;
+                    case 'lip-sync':
+                        endpoint = 'kling-lip-sync';
+                        payload = {
+                            imageUrl: mediaUrl,
+                            audioUrl
+                        };
+                        break;
+                }
+
+                const response = await fetch(`${API_BASE}/api/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode: endpoint, ...payload })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.taskId) {
+                    document.getElementById('kling-status').className = 'status pending';
+                    document.getElementById('kling-status').textContent = `⏳ Kling 任务已提交: ${data.taskId}`;
+                    document.getElementById('kling-result').classList.add('show');
+                    klingState.taskId = data.taskId;
+                    await pollKlingStatus(data.taskId, model, mode);
+                } else {
+                    throw new Error(data.error || '提交失败');
+                }
+            } catch (err) {
+                document.getElementById('kling-status').className = 'status error';
+                document.getElementById('kling-status').textContent = '❌ ' + err.message;
+                document.getElementById('kling-result').classList.add('show');
+            } finally {
+                document.getElementById('kling-loading').classList.remove('show');
+            }
+        }
+
+        async function pollKlingStatus(taskId, model, mode) {
+            const checkStatus = async () => {
+                try {
+                    let type = 'video';
+                    if (mode === 'image') type = 'image';
+                    if (mode === 'video-to-audio') type = 'audio';
+                    if (mode === 'lip-sync') type = 'avatar';
+
+                    const response = await fetch(`${API_BASE}/api/status?jobId=${taskId}&model=${model}&type=${type}`);
+                    const data = await response.json();
+
+                    if (data.status === 'completed') {
+                        document.getElementById('kling-status').className = 'status success';
+                        document.getElementById('kling-status').textContent = '✅ Kling 任务完成！';
+
+                        const container = document.getElementById('kling-output-container');
+                        const url = data.url || data.videoUrl || data.imageUrl || data.audioUrl;
+
+                        if (mode === 'image' && data.imageUrl) {
+                            container.innerHTML = `<img src="${data.imageUrl}" style="max-width:100%;border-radius:10px;">`;
+                            klingState.resultUrl = data.imageUrl;
+                            klingState.resultType = 'image';
+                            saveToGallery('image', data.imageUrl, document.getElementById('kling-prompt').value, model);
+                        } else if (mode === 'video-to-audio' && data.audioUrl) {
+                            container.innerHTML = `<audio src="${data.audioUrl}" controls style="width:100%;"></audio>`;
+                            klingState.resultUrl = data.audioUrl;
+                            klingState.resultType = 'audio';
+                        } else if (data.videoUrl) {
+                            container.innerHTML = `<video src="${data.videoUrl}" controls style="max-width:100%;border-radius:10px;"></video>`;
+                            klingState.resultUrl = data.videoUrl;
+                            klingState.resultType = 'video';
+                            saveToGallery('video', data.videoUrl, document.getElementById('kling-prompt').value, model);
+                            document.getElementById('kling-follow-actions').style.display = 'flex';
+                        }
+                    } else if (data.status === 'failed' || data.status === 'error' || data.error) {
+                        throw new Error(data.message || data.error || '生成失败');
+                    } else {
+                        document.getElementById('kling-status').textContent = `⏳ 生成中: ${taskId}`;
+                        setTimeout(checkStatus, 10000);
+                    }
+                } catch (err) {
+                    document.getElementById('kling-status').className = 'status error';
+                    document.getElementById('kling-status').textContent = '❌ ' + err.message;
+                }
+            };
+            checkStatus();
+        }
+
+        function useKlingResultForAudio() {
+            if (!klingState.resultUrl || klingState.resultType !== 'video') {
+                alert('没有可用的视频结果');
+                return;
+            }
+            document.getElementById('kling-mode').value = 'video-to-audio';
+            onKlingModeChange();
+            document.getElementById('kling-video-url').value = klingState.resultUrl;
+            document.getElementById('kling-prompt').value = 'generate matching sound effects';
+        }
+
+        function useKlingResultForLipSync() {
+            if (!klingState.resultUrl || klingState.resultType !== 'video') {
+                alert('没有可用的视频结果');
+                return;
+            }
+            document.getElementById('kling-mode').value = 'lip-sync';
+            onKlingModeChange();
+            document.getElementById('kling-media-url').value = klingState.resultUrl;
+        }
+
+        function extendKlingVideo() {
+            if (!klingState.resultUrl || klingState.resultType !== 'video') {
+                alert('没有可用的视频结果');
+                return;
+            }
+            alert('视频延长功能开发中...');
+        }
+
+        function loadFromGallery(inputId, type) {
+            const gallery = JSON.parse(localStorage.getItem('gallery') || '[]');
+            const items = gallery.filter(item => item.type === type);
+
+            if (items.length === 0) {
+                alert(`作品库中没有${type === 'image' ? '图片' : '视频'}`);
+                return;
+            }
+
+            // 创建选择对话框
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.9);
+                display: flex;
+                flex-direction: column;
+                z-index: 9999;
+                padding: 20px;
+            `;
+
+            const title = document.createElement('h3');
+            title.textContent = `选择${type === 'image' ? '图片' : '视频'}`;
+            title.style.cssText = 'color: white; text-align: center; margin-bottom: 20px;';
+            modal.appendChild(title);
+
+            const grid = document.createElement('div');
+            grid.style.cssText = `
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 15px;
+                overflow-y: auto;
+                flex: 1;
+            `;
+
+            items.slice(0, 20).forEach(item => {
+                const div = document.createElement('div');
+                div.style.cssText = `
+                    background: rgba(255,255,255,0.1);
+                    border-radius: 10px;
+                    padding: 10px;
+                    cursor: pointer;
+                    transition: transform 0.2s;
+                `;
+                div.innerHTML = type === 'image'
+                    ? `<img src="${item.url}" style="width:100%;height:150px;object-fit:cover;border-radius:8px;"><p style="color:#aaa;font-size:12px;margin-top:8px;">${item.prompt?.slice(0, 30) || '无描述'}...</p>`
+                    : `<video src="${item.url}" style="width:100%;height:150px;object-fit:cover;border-radius:8px;"></video><p style="color:#aaa;font-size:12px;margin-top:8px;">${item.prompt?.slice(0, 30) || '无描述'}...</p>`;
+                div.onclick = () => {
+                    document.getElementById(inputId).value = item.url;
+                    document.body.removeChild(modal);
+                };
+                div.onmouseenter = () => div.style.transform = 'scale(1.02)';
+                div.onmouseleave = () => div.style.transform = 'scale(1)';
+                grid.appendChild(div);
+            });
+
+            modal.appendChild(grid);
+
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = '关闭';
+            closeBtn.style.cssText = `
+                margin-top: 20px;
+                padding: 10px 30px;
+                background: rgba(255,255,255,0.2);
+                border: none;
+                border-radius: 20px;
+                color: white;
+                cursor: pointer;
+                align-self: center;
+            `;
+            closeBtn.onclick = () => document.body.removeChild(modal);
+            modal.appendChild(closeBtn);
+
+            document.body.appendChild(modal);
         }
 
         // Lightbox 放大查看功能
