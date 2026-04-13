@@ -9,13 +9,14 @@ const MJ_BASE_URL = "https://api.bltcy.ai/mj-relax";
 const { uploadImage } = require('./image-upload');
 
 /**
- * MJ Imagine - 文生图 (Relax 模式)
+ * MJ Imagine - 文生图 / 参考图+文生图 (Relax 模式)
  */
 async function mjImagine(params, apiKey) {
   const {
     prompt,
     aspect = "1:1",  // 1:1, 16:9, 9:16, 4:3, etc.
     noWait = false,
+    images = [],       // 参考图 URL 数组（最多 4 张）
   } = params;
 
   const endpoint = `${MJ_BASE_URL}/mj/submit/imagine`;
@@ -24,6 +25,33 @@ async function mjImagine(params, apiKey) {
     prompt: prompt,
     aspect_ratio: aspect,
   };
+
+  // 参考图 base64 数组
+  if (images && images.length > 0) {
+    const base64Array = [];
+    for (const img of images.slice(0, 4)) {
+      if (img.startsWith('data:image')) {
+        // 已经是 base64
+        base64Array.push(img);
+      } else {
+        // URL，下载转 base64
+        try {
+          console.log('[MJ] Downloading reference image:', img);
+          const imgRes = await fetch(img);
+          const imgBuf = await imgRes.arrayBuffer();
+          const b64 = Buffer.from(imgBuf).toString('base64');
+          // 检测 MIME type
+          const mime = img.includes('.png') || img.includes('png') ? 'image/png' : 'image/jpeg';
+          base64Array.push(`data:${mime};base64,${b64}`);
+        } catch (e) {
+          console.error('[MJ] Failed to download reference image:', img, e.message);
+        }
+      }
+    }
+    if (base64Array.length > 0) {
+      body.base64Array = base64Array;
+    }
+  }
 
   const response = await fetch(endpoint, {
     method: "POST",

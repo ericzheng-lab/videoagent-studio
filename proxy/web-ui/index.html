@@ -315,6 +315,16 @@
 
             <div class="row">
                 <div>
+                    <!-- 参考图片区域 -->
+                    <div class="form-group">
+                        <label>🖼️ 参考图片（可选，最多 4 张）</label>
+                        <div id="mjstudio-ref-images" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
+                        <div class="quick-actions">
+                            <button class="mini-btn" onclick="addRefImage('mjstudio', 'file')">📁 本地上传</button>
+                            <button class="mini-btn" onclick="addRefImage('mjstudio', 'url')">🔗 粘贴 URL</button>
+                            <button class="mini-btn" onclick="addRefImage('mjstudio', 'gallery')">📂 作品库</button>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label>MJ 提示词 (Prompt)</label>
                         <textarea id="mjstudio-prompt" placeholder="例如：A lone swordsman standing on a cliff above the sea, storm clouds, cinematic, dramatic light, highly detailed"></textarea>
@@ -578,10 +588,20 @@
                 <div>
                     <div class="form-group">
                         <label>模式</label>
-                        <select id="nanobanana-mode">
+                        <select id="nanobanana-mode" onchange="toggleNanoBananaMode()">
                             <option value="generate">文生图</option>
                             <option value="edit">编辑已有图片</option>
                         </select>
+                    </div>
+                    <!-- 参考图片区域 -->
+                    <div class="form-group">
+                        <label>🖼️ 参考图片（最多 4 张）</label>
+                        <div id="nanobanana-ref-images" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
+                        <div class="quick-actions">
+                            <button class="mini-btn" onclick="addRefImage('nanobanana', 'file')">📁 本地上传</button>
+                            <button class="mini-btn" onclick="addRefImage('nanobanana', 'url')">🔗 粘贴 URL</button>
+                            <button class="mini-btn" onclick="addRefImage('nanobanana', 'gallery')">📂 作品库</button>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>提示词 (Prompt)</label>
@@ -728,6 +748,7 @@
         async function generateMJStudioImage() {
             const prompt = document.getElementById('mjstudio-prompt').value;
             const aspect = document.getElementById('mjstudio-aspect').value;
+            const refImages = getRefImages('mjstudio');
             if (!prompt) { alert('请输入提示词'); return; }
             
             document.getElementById('mjstudio-loading').classList.add('show');
@@ -740,10 +761,13 @@
                 document.getElementById('mjstudio-status').textContent = '⏳ Midjourney 提交中（Relax 模式，通常 1-2 分钟）...';
                 document.getElementById('mjstudio-result').classList.add('show');
                 
+                const payload = { mode: 'mj-imagine', prompt, aspect, noWait: true };
+                if (refImages.length > 0) payload.images = refImages;
+                
                 const response = await fetch(`${API_BASE}/api/generate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mode: 'mj-imagine', prompt, aspect, noWait: true })
+                    body: JSON.stringify(payload)
                 });
                 const data = await response.json();
                 if (!(data.success && data.taskId)) throw new Error(data.error || 'Midjourney 提交失败');
@@ -1145,14 +1169,11 @@
             const mode = document.getElementById('nanobanana-mode').value;
             const prompt = document.getElementById('nanobanana-prompt').value;
             const aspect = document.getElementById('nanobanana-aspect').value;
-            const imageUrl = document.getElementById('nanobanana-image-url').value;
+            const refImages = getRefImages('nanobanana');
+            const singleImageUrl = document.getElementById('nanobanana-image-url')?.value;
 
             if (!prompt) {
                 alert('请输入提示词');
-                return;
-            }
-            if (mode === 'edit' && !imageUrl) {
-                alert('编辑模式请输入原图 URL');
                 return;
             }
 
@@ -1160,9 +1181,10 @@
             document.getElementById('nanobanana-result').classList.remove('show');
 
             try {
-                const payload = mode === 'edit'
-                    ? { mode: 'nano-banana-edit', prompt, image: imageUrl, aspect }
-                    : { mode: 'nano-banana-generate', prompt, aspect };
+                // 统一使用 generate 端点，带参考图
+                const images = refImages.length > 0 ? refImages : (singleImageUrl ? [singleImageUrl] : []);
+                const payload = { mode: 'nano-banana-generate', prompt, aspect };
+                if (images.length > 0) payload.images = images;
 
                 const response = await fetch(`${API_BASE}/api/generate`, {
                     method: 'POST',
@@ -1740,6 +1762,104 @@
                     if (m) document.body.removeChild(m);
                 }
             };
+        }
+
+        // ==================== 参考图片管理（NanoBanana + MJ） ====================
+        const refImageStates = { mjstudio: [], nanobanana: [] };
+
+        function addRefImage(panel, source) {
+            const state = refImageStates[panel];
+            if (state.length >= 4) { alert('最多 4 张参考图'); return; }
+            if (source === 'file') { triggerFileUpload(panel); }
+            else if (source === 'url') { promptImageUrl(panel); }
+            else if (source === 'gallery') { loadFromGalleryForRef(panel); }
+        }
+
+        function triggerFileUpload(panel) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    refImageStates[panel].push(ev.target.result);
+                    renderRefImages(panel);
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        }
+
+        function promptImageUrl(panel) {
+            const url = prompt('输入图片 URL：');
+            if (url && url.trim()) {
+                refImageStates[panel].push(url.trim());
+                renderRefImages(panel);
+            }
+        }
+
+        function loadFromGalleryForRef(panel) {
+            const gallery = JSON.parse(localStorage.getItem('gallery') || '[]');
+            const items = gallery.filter(item => item.type === 'image');
+            if (items.length === 0) { alert('作品库没有图片'); return; }
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:flex;flex-direction:column;z-index:9999;padding:20px;';
+            const title = document.createElement('h3');
+            title.textContent = '选择参考图';
+            title.style.cssText = 'color:white;text-align:center;margin-bottom:20px;';
+            modal.appendChild(title);
+            const grid = document.createElement('div');
+            grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:15px;overflow-y:auto;flex:1;';
+            items.slice(0, 20).forEach(item => {
+                const div = document.createElement('div');
+                div.style.cssText = 'background:rgba(255,255,255,0.1);border-radius:10px;padding:10px;cursor:pointer;transition:transform 0.2s;';
+                div.innerHTML = `<img src="${item.url}" style="width:100%;height:150px;object-fit:cover;border-radius:8px;"><p style="color:#aaa;font-size:12px;margin-top:8px;">${item.prompt?.slice(0, 30) || ''}...</p>`;
+                div.onclick = () => {
+                    if (refImageStates[panel].length < 4) {
+                        refImageStates[panel].push(item.url);
+                        renderRefImages(panel);
+                        document.body.removeChild(modal);
+                    } else { alert('最多 4 张'); }
+                };
+                div.onmouseenter = () => div.style.transform = 'scale(1.02)';
+                div.onmouseleave = () => div.style.transform = 'scale(1)';
+                grid.appendChild(div);
+            });
+            modal.appendChild(grid);
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = '关闭';
+            closeBtn.style.cssText = 'margin-top:20px;padding:10px 30px;background:rgba(255,255,255,0.2);border:none;border-radius:20px;color:white;cursor:pointer;align-self:center;';
+            closeBtn.onclick = () => document.body.removeChild(modal);
+            modal.appendChild(closeBtn);
+            document.body.appendChild(modal);
+        }
+
+        function renderRefImages(panel) {
+            const container = document.getElementById(`${panel}-ref-images`);
+            if (!container) return;
+            const state = refImageStates[panel];
+            container.innerHTML = state.map((url, i) => `
+                <div style="position:relative;width:80px;height:80px;border-radius:8px;overflow:hidden;border:2px solid rgba(255,255,255,0.2);">
+                    <img src="${url}" style="width:100%;height:100%;object-fit:cover;">
+                    <span onclick="removeRefImage('${panel}', ${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.7);color:#ff4444;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;">&times;</span>
+                </div>
+            `).join('');
+        }
+
+        function removeRefImage(panel, index) {
+            refImageStates[panel].splice(index, 1);
+            renderRefImages(panel);
+        }
+
+        function getRefImages(panel) {
+            return refImageStates[panel] || [];
+        }
+
+        function clearRefImages(panel) {
+            refImageStates[panel] = [];
+            renderRefImages(panel);
         }
     </script>
 </body>

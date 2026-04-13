@@ -8,10 +8,10 @@ const MJ_BASE_URL = "https://api.bltcy.ai";
 const { uploadImage } = require('./image-upload');
 
 /**
- * NanoBanana Generate - 文生图 (同步返回)
+ * NanoBanana Generate - 文生图 / 参考图+文生图 (同步返回)
  */
 async function nanoBananaGenerate(params, apiKey) {
-  const { prompt, aspect = "1:1" } = params;
+  const { prompt, aspect = "1:1", images = [] } = params;
 
   const endpoint = `${MJ_BASE_URL}/v1/images/generations`;
 
@@ -21,6 +21,11 @@ async function nanoBananaGenerate(params, apiKey) {
     aspect_ratio: aspect,
     response_format: "url",
   };
+
+  // 参考图数组（最多 4 张，url 或 b64_json）
+  if (images && images.length > 0) {
+    body.image = images.slice(0, 4);
+  }
 
   console.log('[NanoBanana] Request:', endpoint, JSON.stringify(body));
 
