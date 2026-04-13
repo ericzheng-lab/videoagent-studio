@@ -59,9 +59,9 @@ const CHEAP_IMAGE_MODELS = {
   "dall-e-3": "dall-e-3",
 
   // Seedream 5 (豆包即梦 5.0)
-  "seedream-5": "doubao-seedream-3-0-t2i-250415",
-  "seedream-5.0": "doubao-seedream-3-0-t2i-250415",
-  "doubao-seedream-5": "doubao-seedream-3-0-t2i-250415",
+  "seedream-5": "doubao-seedream-5-0-260128",
+  "seedream-5.0": "doubao-seedream-5-0-260128",
+  "doubao-seedream-5": "doubao-seedream-5-0-260128",
 
   // 即梦/Seedance (¥0.1-0.15)
   "seedream": "seedream-3.0",
