@@ -109,8 +109,16 @@ function detectProvider(modelId) {
   return SUPPORTED_MODELS[modelId] || null;
 }
 
+// CORS helper
+function setCorsHeaders(res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+}
+
 // 主处理器
 module.exports = async function handler(req, res) {
+  setCorsHeaders(res);
   if (req.method === "OPTIONS") return res.status(204).end();
 
   // Health check
