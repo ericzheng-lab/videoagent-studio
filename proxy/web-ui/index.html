@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -278,83 +278,83 @@
     <div class="container">
         <header>
             <h1>🎨 Drs' Visual Arts Center</h1>
-            <p>AI 图像与视频生成平台</p>
+            <p>AI Image & Video Generation Platform</p>
         </header>
 
         <div class="tabs">
             <button class="tab active" data-tab="mjstudio" onclick="switchTab('mjstudio', this)">🎛️ MJ Studio</button>
             <button class="tab" data-tab="kling" onclick="switchTab('kling', this)">🎬 Kling Studio</button>
-            <button class="tab" data-tab="image" onclick="switchTab('image', this)">🖼️ 图像生成</button>
+            <button class="tab" data-tab="image" onclick="switchTab('image', this)">🖼️ Image Gen</button>
             <button class="tab" data-tab="nanobanana" onclick="switchTab('nanobanana', this)">🍌 NanoBanana</button>
-            <button class="tab" data-tab="edit" onclick="switchTab('edit', this)">✏️ MJ 编辑</button>
-            <button class="tab" data-tab="video" onclick="switchTab('video', this)">🎬 视频生成</button>
-            <button class="tab" data-tab="gallery" onclick="switchTab('gallery', this)">📁 作品库</button>
+            <button class="tab" data-tab="edit" onclick="switchTab('edit', this)">✏️ MJ Edit</button>
+            <button class="tab" data-tab="video" onclick="switchTab('video', this)">🎬 Video Gen</button>
+            <button class="tab" data-tab="gallery" onclick="switchTab('gallery', this)">📁 Gallery</button>
         </div>
 
-        <!-- MJ Studio 面板 -->
-        <div id="mjstudio-panel" class="panel active">
-            <div class="helper-card">
+        <!-- MJ Studio Panel -->
+        <div id=”mjstudio-panel” class=”panel active”>
+            <div class=”helper-card”>
                 <h3>Midjourney Studio</h3>
-                <p>这里把 Midjourney 的核心工作流集中在一起：首图生成、U1-U4 放大、V1-V4 变化、Reroll 重抽、以及编辑（加元素 / 扩图 / 改比例）。全部默认走 <strong>Relax</strong> 模式，价格按 <strong>¥1.00</strong> 展示。</p>
-                <div class="quick-actions">
-                    <button class="mini-btn" onclick="fillMJPrompt('cinematic portrait of a young woman, golden hour, film still, ultra detailed')">示例：电影感人像</button>
-                    <button class="mini-btn" onclick="fillMJPrompt('a futuristic city street in heavy rain, neon reflections, dramatic lighting')">示例：赛博城市</button>
-                    <button class="mini-btn" onclick="fillMJEditPrompt('在画面右侧增加更多环境细节，并扩成 9:16 竖构图')">示例：扩图编辑</button>
+                <p>Core Midjourney workflows in one place: image generation, U1-U4 upscale, V1-V4 variations, Reroll, and editing (add elements / outpaint / change aspect ratio). Defaults to <strong>Relax</strong> mode, priced at <strong>¥1.00</strong>.</p>
+                <div class=”quick-actions”>
+                    <button class=”mini-btn” onclick=”fillMJPrompt('cinematic portrait of a young woman, golden hour, film still, ultra detailed')”>Example: Cinematic Portrait</button>
+                    <button class=”mini-btn” onclick=”fillMJPrompt('a futuristic city street in heavy rain, neon reflections, dramatic lighting')”>Example: Cyber City</button>
+                    <button class=”mini-btn” onclick=”fillMJEditPrompt('Expand environmental details on the right side and outpaint to 9:16 vertical')”>Example: Outpaint Edit</button>
                 </div>
             </div>
 
-            <div class="helper-card">
-                <h3>怎么用</h3>
+            <div class=”helper-card”>
+                <h3>How to Use</h3>
                 <ul>
-                    <li><strong>出图：</strong>在下方输入提示词、比例，点击“生成 Midjourney 图像”。</li>
-                    <li><strong>放大 / 变化：</strong>首图完成后，下方会自动出现 U1-U4 / V1-V4 / REROLL 按钮。</li>
-                    <li><strong>编辑：</strong>可把当前结果图一键带入编辑面板，继续加元素、改比例、扩范围。</li>
-                    <li><strong>作品库联动：</strong>作品库里的图片也可以一键带入 MJ 编辑，无需手动复制 URL。</li>
+                    <li><strong>Generate:</strong> Enter a prompt and aspect ratio below, then click “Generate Midjourney Image”.</li>
+                    <li><strong>Upscale / Variate:</strong> After the initial image, U1-U4 / V1-V4 / REROLL buttons appear automatically.</li>
+                    <li><strong>Edit:</strong> Send the current result to the edit panel to add elements, change aspect, or expand the frame.</li>
+                    <li><strong>Gallery Integration:</strong> Images from the gallery can be sent directly to MJ Edit — no need to copy URLs.</li>
                 </ul>
             </div>
 
             <div class="row">
                 <div>
-                    <!-- 参考图片区域 -->
+                    <!-- Reference images -->
                     <div class="form-group">
-                        <label>🖼️ 参考图片（可选，最多 4 张）</label>
+                        <label>🖼️ Reference Images (Optional, up to 4)</label>
                         <div id="mjstudio-ref-images" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
                         <div class="quick-actions">
-                            <button class="mini-btn" onclick="addRefImage('mjstudio', 'file')">📁 本地上传</button>
-                            <button class="mini-btn" onclick="addRefImage('mjstudio', 'url')">🔗 粘贴 URL</button>
-                            <button class="mini-btn" onclick="addRefImage('mjstudio', 'gallery')">📂 作品库</button>
+                            <button class="mini-btn" onclick="addRefImage('mjstudio', 'file')">📁 Upload File</button>
+                            <button class="mini-btn" onclick="addRefImage('mjstudio', 'url')">🔗 Paste URL</button>
+                            <button class="mini-btn" onclick="addRefImage('mjstudio', 'gallery')">📂 Gallery</button>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>MJ 提示词 (Prompt)</label>
-                        <textarea id="mjstudio-prompt" placeholder="例如：A lone swordsman standing on a cliff above the sea, storm clouds, cinematic, dramatic light, highly detailed"></textarea>
+                        <label>MJ Prompt</label>
+                        <textarea id="mjstudio-prompt" placeholder="e.g. A lone swordsman standing on a cliff above the sea, storm clouds, cinematic, dramatic light, highly detailed"></textarea>
                     </div>
                     <div class="row">
                         <div class="form-group">
-                            <label>画面比例</label>
+                            <label>Aspect Ratio</label>
                             <select id="mjstudio-aspect">
-                                <option value="1:1">1:1 方形</option>
-                                <option value="2:3">2:3 竖图</option>
-                                <option value="3:2">3:2 横图</option>
-                                <option value="9:16">9:16 竖屏</option>
-                                <option value="16:9">16:9 横屏</option>
+                                <option value="1:1">1:1 Square</option>
+                                <option value="2:3">2:3 Portrait</option>
+                                <option value="3:2">3:2 Landscape</option>
+                                <option value="9:16">9:16 Vertical</option>
+                                <option value="16:9">16:9 Horizontal</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>说明</label>
-                            <input value="Relax 模式 / ¥1.00 / 20秒轮询" readonly>
+                            <label>Info</label>
+                            <input value="Relax mode / ¥1.00 / 20s polling" readonly>
                         </div>
                     </div>
-                    <button class="generate-btn" onclick="generateMJStudioImage()">生成 Midjourney 图像</button>
+                    <button class="generate-btn" onclick="generateMJStudioImage()">Generate Midjourney Image</button>
                 </div>
                 <div>
                     <div class="helper-card">
-                        <h3>控制说明</h3>
+                        <h3>Controls</h3>
                         <ul>
-                            <li><strong>U1-U4：</strong>放大四宫格中对应位置的图。</li>
-                            <li><strong>V1-V4：</strong>基于对应位置继续出变化版本。</li>
-                            <li><strong>REROLL：</strong>保留同一提示词重新抽一组。</li>
-                            <li><strong>MJ 编辑：</strong>适合做加元素、扩图、改构图、改比例。</li>
+                            <li><strong>U1-U4:</strong> Upscale the corresponding quadrant image.</li>
+                            <li><strong>V1-V4:</strong> Generate variations based on the corresponding quadrant.</li>
+                            <li><strong>REROLL:</strong> Re-roll with the same prompt for a new set.</li>
+                            <li><strong>MJ Edit:</strong> Add elements, outpaint, recompose, or change aspect ratio.</li>
                         </ul>
                     </div>
                 </div>
@@ -362,79 +362,79 @@
 
             <div class="loading" id="mjstudio-loading">
                 <div class="spinner"></div>
-                <p>正在生成 Midjourney 图像...</p>
+                <p>Generating Midjourney image...</p>
             </div>
 
             <div class="result" id="mjstudio-result">
                 <div class="status" id="mjstudio-status"></div>
-                <img id="mjstudio-output" src="" alt="Midjourney 结果图">
+                <img id="mjstudio-output" src="" alt="Midjourney result">
                 <div class="mj-actions" id="mjstudio-actions" style="display:none;"></div>
                 <div class="quick-actions" id="mjstudio-edit-actions" style="display:none; margin-top:12px;">
-                    <button class="mini-btn" onclick="sendCurrentMJToEdit()">✏️ 把当前结果带去 MJ 编辑</button>
-                    <button class="mini-btn" onclick="useCurrentMJInEdit('在画面外围扩展更多环境细节，保持原风格')">🪄 扩图编辑</button>
-                    <button class="mini-btn" onclick="useCurrentMJInEdit('在保持主体不变的前提下，增加更多场景元素和层次')">➕ 加元素编辑</button>
+                    <button class="mini-btn" onclick="sendCurrentMJToEdit()">✏️ Send to MJ Edit</button>
+                    <button class="mini-btn" onclick="useCurrentMJInEdit('Expand environmental details around the frame, preserve original style')">🪄 Outpaint Edit</button>
+                    <button class="mini-btn" onclick="useCurrentMJInEdit('Add more scene elements and layers while keeping the subject unchanged')">➕ Add Elements</button>
                 </div>
             </div>
         </div>
 
-        <!-- Kling Studio 面板 -->
+        <!-- Kling Studio Panel -->
         <div id="kling-panel" class="panel">
             <div class="helper-card">
-                <h3>🎬 Kling Studio - 可灵 AI 统一工作台</h3>
-                <p>一站式使用 Kling 所有功能：<strong>视频生成</strong>（文生视频、图生视频）、<strong>图像生成</strong>、<strong>视频转音频</strong>、<strong>对口型</strong>。支持从作品库直接选择素材。</p>
+                <h3>🎬 Kling Studio - Unified Workspace</h3>
+                <p>All Kling features in one place: <strong>Video Generation</strong> (text-to-video, image-to-video), <strong>Image Generation</strong>, <strong>Video-to-Audio</strong>, <strong>Lip Sync</strong>. Select assets directly from the gallery.</p>
                 <div class="quick-actions">
-                    <button class="mini-btn" onclick="switchKlingMode('video')">🎬 视频生成</button>
-                    <button class="mini-btn" onclick="switchKlingMode('image')">🖼️ 图像生成</button>
-                    <button class="mini-btn" onclick="switchKlingMode('audio')">🔊 视频转音频</button>
-                    <button class="mini-btn" onclick="switchKlingMode('lip')">👄 对口型</button>
+                    <button class="mini-btn" onclick="switchKlingMode('video')">🎬 Video Gen</button>
+                    <button class="mini-btn" onclick="switchKlingMode('image')">🖼️ Image Gen</button>
+                    <button class="mini-btn" onclick="switchKlingMode('audio')">🔊 Video-to-Audio</button>
+                    <button class="mini-btn" onclick="switchKlingMode('lip')">👄 Lip Sync</button>
                 </div>
             </div>
 
-            <!-- Kling 模式选择 -->
+            <!-- Kling mode selection -->
             <div class="form-group">
-                <label>选择功能</label>
+                <label>Feature</label>
                 <select id="kling-mode" onchange="onKlingModeChange()">
-                    <option value="video-t2v">🎬 文生视频 (T2V)</option>
-                    <option value="video-i2v">🖼️ 图生视频 (I2V)</option>
-                    <option value="image">🖼️ 图像生成</option>
-                    <option value="video-to-audio">🔊 视频转音频</option>
-                    <option value="lip-sync">👄 对口型 / 数字人</option>
+                    <option value="video-t2v">🎬 Text-to-Video (T2V)</option>
+                    <option value="video-i2v">🖼️ Image-to-Video (I2V)</option>
+                    <option value="image">🖼️ Image Generation</option>
+                    <option value="video-to-audio">🔊 Video-to-Audio</option>
+                    <option value="lip-sync">👄 Lip Sync / Digital Human</option>
                 </select>
             </div>
 
-            <!-- 提示词 -->
+            <!-- Prompt -->
             <div class="form-group">
-                <label id="kling-prompt-label">提示词 (Prompt)</label>
-                <textarea id="kling-prompt" placeholder="描述你想要生成的内容..."></textarea>
+                <label id="kling-prompt-label">Prompt</label>
+                <textarea id="kling-prompt" placeholder="Describe what you want to generate..."></textarea>
             </div>
 
-            <!-- 媒体输入（图生视频 / 对口型） -->
+            <!-- Media input (image-to-video / lip sync) -->
             <div class="form-group" id="kling-media-group" style="display:none;">
-                <label id="kling-media-label">图片 URL</label>
-                <input id="kling-media-url" placeholder="输入图片 URL，或从作品库选择">
+                <label id="kling-media-label">Image URL</label>
+                <input id="kling-media-url" placeholder="Enter image URL or select from gallery">
                 <div class="quick-actions" style="margin-top:8px;">
-                    <button class="mini-btn" onclick="loadFromGallery('kling-media-url', 'image')">📁 从作品库选择图片</button>
+                    <button class="mini-btn" onclick="loadFromGallery('kling-media-url', 'image')">📁 Select from Gallery</button>
                 </div>
             </div>
 
-            <!-- 视频输入（视频转音频 / 视频延长） -->
+            <!-- Video input (video-to-audio / video extend) -->
             <div class="form-group" id="kling-video-group" style="display:none;">
-                <label>视频 URL</label>
-                <input id="kling-video-url" placeholder="输入视频 URL，或从作品库选择">
+                <label>Video URL</label>
+                <input id="kling-video-url" placeholder="Enter video URL or select from gallery">
                 <div class="quick-actions" style="margin-top:8px;">
-                    <button class="mini-btn" onclick="loadFromGallery('kling-video-url', 'video')">📁 从作品库选择视频</button>
+                    <button class="mini-btn" onclick="loadFromGallery('kling-video-url', 'video')">📁 Select from Gallery</button>
                 </div>
             </div>
 
-            <!-- 音频输入（对口型） -->
+            <!-- Audio input (lip sync) -->
             <div class="form-group" id="kling-audio-group" style="display:none;">
-                <label>音频 URL</label>
-                <input id="kling-audio-url" placeholder="输入音频 URL">
+                <label>Audio URL</label>
+                <input id="kling-audio-url" placeholder="Enter audio URL">
             </div>
 
             <div class="row">
                 <div class="form-group">
-                    <label>模型</label>
+                    <label>Model</label>
                     <select id="kling-model">
                         <option value="kling-v2-6">Kling V2.6 <span class="price-tag">¥2.50</span></option>
                         <option value="kling-o1">Kling O1 <span class="price-tag">¥0.80</span></option>
@@ -443,64 +443,64 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>画面比例</label>
+                    <label>Aspect Ratio</label>
                     <select id="kling-aspect">
-                        <option value="16:9">16:9 横屏</option>
-                        <option value="9:16">9:16 竖屏</option>
-                        <option value="1:1">1:1 方形</option>
+                        <option value="16:9">16:9 Horizontal</option>
+                        <option value="9:16">9:16 Vertical</option>
+                        <option value="1:1">1:1 Square</option>
                     </select>
                 </div>
             </div>
 
             <div class="row">
                 <div class="form-group">
-                    <label>时长</label>
+                    <label>Duration</label>
                     <select id="kling-duration">
-                        <option value="5">5 秒</option>
-                        <option value="10">10 秒</option>
+                        <option value="5">5 seconds</option>
+                        <option value="10">10 seconds</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>运镜控制</label>
+                    <label>Camera Motion</label>
                     <select id="kling-camera">
-                        <option value="">无</option>
-                        <option value="zoom_in">推进</option>
-                        <option value="zoom_out">拉远</option>
-                        <option value="pan_left">左移</option>
-                        <option value="pan_right">右移</option>
-                        <option value="tilt_up">上移</option>
-                        <option value="tilt_down">下移</option>
+                        <option value="">None</option>
+                        <option value="zoom_in">Zoom In</option>
+                        <option value="zoom_out">Zoom Out</option>
+                        <option value="pan_left">Pan Left</option>
+                        <option value="pan_right">Pan Right</option>
+                        <option value="tilt_up">Tilt Up</option>
+                        <option value="tilt_down">Tilt Down</option>
                     </select>
                 </div>
             </div>
 
-            <button class="generate-btn" onclick="generateKling()">🚀 提交 Kling 任务</button>
+            <button class="generate-btn" onclick="generateKling()">🚀 Submit Kling Task</button>
 
             <div class="loading" id="kling-loading">
                 <div class="spinner"></div>
-                <p>正在提交 Kling 任务...</p>
+                <p>Submitting Kling task...</p>
             </div>
 
             <div class="result" id="kling-result">
                 <div class="status" id="kling-status"></div>
                 <div id="kling-output-container"></div>
                 <div class="quick-actions" id="kling-follow-actions" style="display:none; margin-top:12px;">
-                    <button class="mini-btn" onclick="useKlingResultForAudio()">🔊 基于此视频生成音频</button>
-                    <button class="mini-btn" onclick="useKlingResultForLipSync()">👄 基于此视频做对口型</button>
-                    <button class="mini-btn" onclick="extendKlingVideo()">⏱️ 延长此视频</button>
+                    <button class="mini-btn" onclick="useKlingResultForAudio()">🔊 Generate Audio from Video</button>
+                    <button class="mini-btn" onclick="useKlingResultForLipSync()">👄 Lip Sync from Video</button>
+                    <button class="mini-btn" onclick="extendKlingVideo()">⏱️ Extend Video</button>
                 </div>
             </div>
         </div>
 
-        <!-- 图像生成面板 -->
+        <!-- Image Generation Panel -->
         <div id="image-panel" class="panel">
             <div class="form-group">
-                <label>提示词 (Prompt)</label>
-                <textarea id="image-prompt" placeholder="描述你想要生成的图像..."></textarea>
+                <label>Prompt</label>
+                <textarea id="image-prompt" placeholder="Describe the image you want to generate..."></textarea>
             </div>
             <div class="row">
                 <div class="form-group">
-                    <label>选择模型</label>
+                    <label>Model</label>
                     <select id="image-model">
                         <option value="flux">Flux <span class="price-tag">¥0.01</span></option>
                         <option value="kling-image-v2-1">Kling Image 2.1 <span class="price-tag">¥0.15</span></option>
@@ -517,41 +517,41 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>图像尺寸</label>
+                    <label>Image Size</label>
                     <select id="image-size">
-                        <option value="1024x1024">1024 × 1024 (方形)</option>
-                        <option value="1024x1536">1024 × 1536 (竖屏)</option>
-                        <option value="1536x1024">1536 × 1024 (横屏)</option>
+                        <option value="1024x1024">1024 × 1024 (Square)</option>
+                        <option value="1024x1536">1024 × 1536 (Portrait)</option>
+                        <option value="1536x1024">1536 × 1024 (Landscape)</option>
                     </select>
                 </div>
             </div>
-            <button class="generate-btn" onclick="generateImage()">生成图像</button>
-            
+            <button class="generate-btn" onclick="generateImage()">Generate Image</button>
+
             <div class="loading" id="image-loading">
                 <div class="spinner"></div>
-                <p>正在生成图像...</p>
+                <p>Generating image...</p>
             </div>
-            
+
             <div class="result" id="image-result">
                 <div class="status" id="image-status"></div>
-                <img id="image-output" src="" alt="生成的图像">
+                <img id="image-output" src="" alt="Generated image">
                 <div class="mj-actions" id="mj-actions" style="display:none;"></div>
             </div>
         </div>
 
-        <!-- MJ 编辑面板 -->
+        <!-- MJ Edit Panel -->
         <div id="edit-panel" class="panel">
             <div class="form-group">
-                <label>原图 URL</label>
-                <input id="edit-image-url" placeholder="输入要编辑的 Midjourney 图片 URL">
+                <label>Original Image URL</label>
+                <input id="edit-image-url" placeholder="Enter the Midjourney image URL to edit">
             </div>
             <div class="form-group">
-                <label>编辑提示词</label>
-                <textarea id="edit-prompt" placeholder="例如：在右侧加一栋玻璃摩天大楼；扩成 9:16；给天空加夕阳云层..."></textarea>
+                <label>Edit Prompt</label>
+                <textarea id="edit-prompt" placeholder="e.g. Add a glass skyscraper on the right; outpaint to 9:16; add sunset clouds to the sky..."></textarea>
             </div>
             <div class="row">
                 <div class="form-group">
-                    <label>目标比例</label>
+                    <label>Target Aspect</label>
                     <select id="edit-aspect">
                         <option value="1:1">1:1</option>
                         <option value="2:3">2:3</option>
@@ -561,104 +561,104 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>可选蒙版 Base64</label>
-                    <input id="edit-mask" placeholder="局部编辑时填 maskBase64（可留空）">
+                    <label>Optional Mask (Base64)</label>
+                    <input id="edit-mask" placeholder="Enter maskBase64 for local edits (optional)">
                 </div>
             </div>
-            <button class="generate-btn" onclick="generateMJEdit()">提交 MJ 编辑</button>
+            <button class="generate-btn" onclick="generateMJEdit()">Submit MJ Edit</button>
 
             <div class="loading" id="edit-loading">
                 <div class="spinner"></div>
-                <p>正在提交 Midjourney 编辑...</p>
+                <p>Submitting Midjourney edit...</p>
             </div>
 
             <div class="result" id="edit-result">
                 <div class="status" id="edit-status"></div>
-                <img id="edit-output" src="" alt="编辑后的图像">
+                <img id="edit-output" src="" alt="Edited image">
             </div>
         </div>
 
-        <!-- NanoBanana 面板 -->
+        <!-- NanoBanana Panel -->
         <div id="nanobanana-panel" class="panel">
             <div class="helper-card">
                 <h3>NanoBanana Pro 4K</h3>
-                <p>适合直接做高质量生成与编辑。默认模型 <strong>nano-banana-pro-4k</strong>，价格按 <strong>¥2.00</strong> 展示。编辑不强制要求 mask，按你现在确认的方式走。</p>
+                <p>High-quality generation and editing. Default model <strong>nano-banana-pro-4k</strong>, priced at <strong>¥2.00</strong>. Editing does not require a mask.</p>
             </div>
             <div class="row">
                 <div>
                     <div class="form-group">
-                        <label>模式</label>
+                        <label>Mode</label>
                         <select id="nanobanana-mode" onchange="toggleNanoBananaMode()">
-                            <option value="generate">文生图</option>
-                            <option value="edit">编辑已有图片</option>
+                            <option value="generate">Text-to-Image</option>
+                            <option value="edit">Edit Existing Image</option>
                         </select>
                     </div>
-                    <!-- 参考图片区域 -->
+                    <!-- Reference images -->
                     <div class="form-group">
-                        <label>🖼️ 参考图片（最多 4 张）</label>
+                        <label>🖼️ Reference Images (up to 4)</label>
                         <div id="nanobanana-ref-images" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
                         <div class="quick-actions">
-                            <button class="mini-btn" onclick="addRefImage('nanobanana', 'file')">📁 本地上传</button>
-                            <button class="mini-btn" onclick="addRefImage('nanobanana', 'url')">🔗 粘贴 URL</button>
-                            <button class="mini-btn" onclick="addRefImage('nanobanana', 'gallery')">📂 作品库</button>
+                            <button class="mini-btn" onclick="addRefImage('nanobanana', 'file')">📁 Upload File</button>
+                            <button class="mini-btn" onclick="addRefImage('nanobanana', 'url')">🔗 Paste URL</button>
+                            <button class="mini-btn" onclick="addRefImage('nanobanana', 'gallery')">📂 Gallery</button>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>提示词 (Prompt)</label>
-                        <textarea id="nanobanana-prompt" placeholder="例如：强化金属质感，提升电影级光影，保留主体构图"></textarea>
+                        <label>Prompt</label>
+                        <textarea id="nanobanana-prompt" placeholder="e.g. Enhance metallic texture, cinematic lighting, preserve composition"></textarea>
                     </div>
                     <div class="form-group" id="nanobanana-image-group" style="display:none;">
-                        <label>原图 URL</label>
-                        <input id="nanobanana-image-url" placeholder="输入要编辑的图片 URL">
+                        <label>Original Image URL</label>
+                        <input id="nanobanana-image-url" placeholder="Enter image URL to edit">
                     </div>
                     <div class="row">
                         <div class="form-group">
-                            <label>画面比例</label>
+                            <label>Aspect Ratio</label>
                             <select id="nanobanana-aspect">
-                                <option value="1:1">1:1 方形</option>
-                                <option value="2:3">2:3 竖图</option>
-                                <option value="3:2">3:2 横图</option>
-                                <option value="9:16">9:16 竖屏</option>
-                                <option value="16:9">16:9 横屏</option>
+                                <option value="1:1">1:1 Square</option>
+                                <option value="2:3">2:3 Portrait</option>
+                                <option value="3:2">3:2 Landscape</option>
+                                <option value="9:16">9:16 Vertical</option>
+                                <option value="16:9">16:9 Horizontal</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>说明</label>
+                            <label>Info</label>
                             <input value="NanoBanana / ¥2.00 / prompt + aspect" readonly>
                         </div>
                     </div>
-                    <button class="generate-btn" onclick="generateNanoBanana()">提交 NanoBanana</button>
+                    <button class="generate-btn" onclick="generateNanoBanana()">Submit NanoBanana</button>
                 </div>
                 <div>
                     <div class="helper-card">
-                        <h3>使用建议</h3>
+                        <h3>Usage Tips</h3>
                         <ul>
-                            <li><strong>文生图：</strong>直接输入 prompt + aspect。</li>
-                            <li><strong>编辑：</strong>输入原图 URL + prompt + aspect，不强制 mask。</li>
-                            <li><strong>适合：</strong>整体风格增强、材质强化、细节重绘、直接高质量输出。</li>
+                            <li><strong>Text-to-Image:</strong> Enter prompt + aspect ratio.</li>
+                            <li><strong>Edit:</strong> Enter original image URL + prompt + aspect. Mask is optional.</li>
+                            <li><strong>Best for:</strong> Style enhancement, material enhancement, detail refinement, high-quality output.</li>
                         </ul>
                     </div>
                 </div>
             </div>
             <div class="loading" id="nanobanana-loading">
                 <div class="spinner"></div>
-                <p>正在提交 NanoBanana 任务...</p>
+                <p>Submitting NanoBanana task...</p>
             </div>
             <div class="result" id="nanobanana-result">
                 <div class="status" id="nanobanana-status"></div>
-                <img id="nanobanana-output" src="" alt="NanoBanana 结果图">
+                <img id="nanobanana-output" src="" alt="NanoBanana result">
             </div>
         </div>
 
-        <!-- 视频生成面板 -->
+        <!-- Video Generation Panel -->
         <div id="video-panel" class="panel">
             <div class="form-group">
-                <label>提示词 (Prompt)</label>
-                <textarea id="video-prompt" placeholder="描述你想要生成的视频..."></textarea>
+                <label>Prompt</label>
+                <textarea id="video-prompt" placeholder="Describe the video you want to generate..."></textarea>
             </div>
             <div class="row">
                 <div class="form-group">
-                    <label>选择模型</label>
+                    <label>Model</label>
                     <select id="video-model">
                         <option value="kling-o1">Kling O1 <span class="price-tag">¥0.80</span></option>
                         <option value="wan2.2-flash">Wan 2.2 Flash <span class="price-tag">¥0.80</span></option>
@@ -666,38 +666,38 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>视频时长</label>
+                    <label>Duration</label>
                     <select id="video-duration">
-                        <option value="5">5 秒</option>
-                        <option value="10">10 秒</option>
+                        <option value="5">5 seconds</option>
+                        <option value="10">10 seconds</option>
                     </select>
                 </div>
             </div>
             <div class="form-group">
-                <label>画面比例</label>
+                <label>Aspect Ratio</label>
                 <select id="video-ratio">
-                    <option value="16:9">16:9 横屏</option>
-                    <option value="9:16">9:16 竖屏</option>
-                    <option value="1:1">1:1 方形</option>
+                    <option value="16:9">16:9 Horizontal</option>
+                    <option value="9:16">9:16 Vertical</option>
+                    <option value="1:1">1:1 Square</option>
                 </select>
             </div>
-            <button class="generate-btn" onclick="generateVideo()">生成视频</button>
-            
+            <button class="generate-btn" onclick="generateVideo()">Generate Video</button>
+
             <div class="loading" id="video-loading">
                 <div class="spinner"></div>
-                <p>正在生成视频，这可能需要几分钟...</p>
+                <p>Generating video, this may take a few minutes...</p>
             </div>
-            
+
             <div class="result" id="video-result">
                 <div class="status" id="video-status"></div>
                 <video id="video-output" controls></video>
             </div>
         </div>
 
-        <!-- 作品库面板 -->
+        <!-- Gallery Panel -->
         <div id="gallery-panel" class="panel">
             <div class="gallery" id="gallery-grid">
-                <!-- 动态加载 -->
+                <!-- Dynamic loading -->
             </div>
         </div>
     </div>
@@ -749,7 +749,7 @@
             const prompt = document.getElementById('mjstudio-prompt').value;
             const aspect = document.getElementById('mjstudio-aspect').value;
             const refImages = getRefImages('mjstudio');
-            if (!prompt) { alert('请输入提示词'); return; }
+            if (!prompt) { alert('Please enter a prompt'); return; }
             
             document.getElementById('mjstudio-loading').classList.add('show');
             document.getElementById('mjstudio-result').classList.remove('show');
@@ -758,7 +758,7 @@
             
             try {
                 document.getElementById('mjstudio-status').className = 'status pending';
-                document.getElementById('mjstudio-status').textContent = '⏳ Midjourney 提交中（Relax 模式，通常 1-2 分钟）...';
+                document.getElementById('mjstudio-status').textContent = '⏳ Submitting Midjourney (Relax mode, ~1-2 min)...';
                 document.getElementById('mjstudio-result').classList.add('show');
                 
                 const payload = { mode: 'mj-imagine', prompt, aspect, noWait: true };
@@ -770,10 +770,10 @@
                     body: JSON.stringify(payload)
                 });
                 const data = await response.json();
-                if (!(data.success && (data.jobId || data.taskId))) throw new Error(data.error || 'Midjourney 提交失败');
+                if (!(data.success && (data.jobId || data.taskId))) throw new Error(data.error || 'Midjourney submission failed');
 
                 mjStudioState = { taskId: data.jobId || data.taskId, buttons: [], prompt, aspect, imageUrl: null, originalUrl: null, lastAction: 'imagine', lastButton: null };
-                document.getElementById('mjstudio-status').textContent = `⏳ Midjourney 任务已提交：${data.jobId || data.taskId}，每 20 秒检查一次...`;
+                document.getElementById('mjstudio-status').textContent = `⏳ Midjourney task submitted: ${data.jobId || data.taskId}, polling every 20s...`;
                 await pollMJStudioStatus(data.jobId || data.taskId);
             } catch (err) {
                 document.getElementById('mjstudio-status').className = 'status error';
@@ -790,7 +790,7 @@
                     const data = await res.json();
                     if (data.status === 'completed') {
                         document.getElementById('mjstudio-status').className = 'status success';
-                        document.getElementById('mjstudio-status').textContent = `✅ Midjourney 完成！价格: ${data.price || '¥1.00'}`;
+                        document.getElementById('mjstudio-status').textContent = `✅ Midjourney complete! Price: ${data.price || '¥1.00'}`;
                         document.getElementById('mjstudio-output').src = data.imageUrl;
                         document.getElementById('mjstudio-result').classList.add('show');
                         mjStudioState.taskId = taskId;
@@ -800,10 +800,10 @@
                         renderMJStudioButtons();
                         saveToGallery('image', data.imageUrl, mjStudioState.prompt, 'midjourney');
                     } else if (data.status === 'failure' || data.status === 'failed' || data.error) {
-                        throw new Error(data.message || data.error || 'Midjourney 生成失败');
+                        throw new Error(data.message || data.error || 'Midjourney generation failed');
                     } else {
                         document.getElementById('mjstudio-status').className = 'status pending';
-                        document.getElementById('mjstudio-status').textContent = `⏳ Midjourney 生成中（任务 ${taskId}），20 秒后继续检查...`;
+                        document.getElementById('mjstudio-status').textContent = `⏳ Midjourney generating (task ${taskId}), checking again in 20s...`;
                         setTimeout(check, 20000);
                     }
                 } catch (err) {
@@ -819,18 +819,18 @@
             const isUpscaledSingle = /upscale|upsample/i.test(mjStudioState.lastAction || '') || /^U[1-4]$/i.test(mjStudioState.lastButton || '');
             const labels = ['U1','U2','U3','U4','V1','V2','V3','V4','REROLL'];
             const helper = isUpscaledSingle
-                ? `<div style="width:100%;margin-bottom:10px;color:#8fd3ff;font-size:0.92rem;">当前结果已是单张图，可以直接带去 MJ 编辑。</div>`
-                : `<div style="width:100%;margin-bottom:10px;color:#ffd166;font-size:0.92rem;">当前是四宫格总图。若要精确编辑某一张，请先点击对应的 U1-U4 放大成单张，再进入 MJ 编辑。</div>`;
+                ? `<div style="width:100%;margin-bottom:10px;color:#8fd3ff;font-size:0.92rem;">Result is a single image. You can send it directly to MJ Edit.</div>`
+                : `<div style="width:100%;margin-bottom:10px;color:#ffd166;font-size:0.92rem;">Result is a 4-grid overview. To edit a specific image, click U1-U4 to upscale first, then enter MJ Edit.</div>`;
             container.innerHTML = helper + labels.map(l => `<button class="mj-btn" onclick="handleMJStudioAction('${l}')">${l}</button>`).join('');
             container.style.display = 'flex';
             document.getElementById('mjstudio-edit-actions').style.display = isUpscaledSingle ? 'flex' : 'none';
         }
         
         async function handleMJStudioAction(label) {
-            if (!mjStudioState.taskId) { alert('没有可操作的 Midjourney 任务'); return; }
+            if (!mjStudioState.taskId) { alert('No active Midjourney task'); return; }
             document.getElementById('mjstudio-loading').classList.add('show');
             document.getElementById('mjstudio-status').className = 'status pending';
-            document.getElementById('mjstudio-status').textContent = `⏳ 正在执行 ${label}...`;
+            document.getElementById('mjstudio-status').textContent = `⏳ Executing ${label}...`;
             
             try {
                 let payload;
@@ -843,7 +843,7 @@
                 }
                 const res = await fetch(`${API_BASE}/api/generate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 const data = await res.json();
-                if (!(data.success && (data.jobId || data.taskId))) throw new Error(data.error || `${label} 提交失败`);
+                if (!(data.success && (data.jobId || data.taskId))) throw new Error(data.error || `${label} submission failed`);
                 mjStudioState.taskId = data.jobId || data.taskId;
                 mjStudioState.buttons = [];
                 mjStudioState.lastAction = label === 'REROLL' ? 'reroll' : (label.startsWith('U') ? 'upscale' : 'variation');
@@ -858,19 +858,19 @@
         }
         
         function sendCurrentMJToEdit() {
-            if (!mjStudioState.originalUrl) { alert('还没有可用的结果图'); return; }
+            if (!mjStudioState.originalUrl) { alert('No result image available'); return; }
             const isUpscaledSingle = /upscale|upsample/i.test(mjStudioState.lastAction || '') || /^U[1-4]$/i.test(mjStudioState.lastButton || '');
             if (!isUpscaledSingle) {
-                alert('当前是四宫格总图，不能精确指定其中一张做编辑。请先点击 U1/U2/U3/U4，把目标图放大成单张后，再进入 MJ 编辑。');
+                alert('Current result is a 4-grid overview. To edit a specific image, click U1/U2/U3/U4 to upscale first, then enter MJ Edit.');
                 return;
             }
             useForMJEdit(mjStudioState.originalUrl);
         }
         function useCurrentMJInEdit(editPrompt) {
-            if (!mjStudioState.originalUrl) { alert('还没有可用的结果图'); return; }
+            if (!mjStudioState.originalUrl) { alert('No result image available'); return; }
             const isUpscaledSingle = /upscale|upsample/i.test(mjStudioState.lastAction || '') || /^U[1-4]$/i.test(mjStudioState.lastButton || '');
             if (!isUpscaledSingle) {
-                alert('当前是四宫格总图。请先用 U1-U4 选择并放大你要编辑的那一张，再使用编辑功能。');
+                alert('Current result is a 4-grid overview. Please use U1-U4 to select and upscale the image you want to edit, then use the edit feature.');
                 return;
             }
             document.getElementById('edit-image-url').value = mjStudioState.originalUrl;
@@ -885,7 +885,7 @@
             const size = document.getElementById('image-size').value;
             
             if (!prompt) {
-                alert('请输入提示词');
+                alert('Please enter a prompt');
                 return;
             }
             
@@ -897,7 +897,7 @@
             try {
                 if (model === 'midjourney') {
                     document.getElementById('image-status').className = 'status pending';
-                    document.getElementById('image-status').textContent = '⏳ Midjourney 提交中（Relax 模式，通常 1-2 分钟）...';
+                    document.getElementById('image-status').textContent = '⏳ Submitting Midjourney (Relax mode, ~1-2 min)...';
                     document.getElementById('image-result').classList.add('show');
 
                     const response = await fetch(`${API_BASE}/api/generate`, {
@@ -913,7 +913,7 @@
                     
                     const data = await response.json();
                     if (!(data.success && (data.jobId || data.taskId))) {
-                        throw new Error(data.error || 'Midjourney 提交失败');
+                        throw new Error(data.error || 'Midjourney submission failed');
                     }
 
                     currentMJ = {
@@ -926,15 +926,15 @@
                     };
 
                     document.getElementById('image-status').className = 'status pending';
-                    document.getElementById('image-status').textContent = `⏳ Midjourney 任务已提交：${data.jobId || data.taskId}，每 20 秒检查一次...`;
+                    document.getElementById('image-status').textContent = `⏳ Midjourney task submitted: ${data.jobId || data.taskId}, polling every 20s...`;
                     await pollMJStatus(data.jobId || data.taskId);
                     return;
                 }
 
-                // Kling Image 异步轮询
+                // Kling Image async polling
                 if (model.startsWith('kling-image')) {
                     document.getElementById('image-status').className = 'status pending';
-                    document.getElementById('image-status').textContent = '⏳ Kling Image 提交中...';
+                    document.getElementById('image-status').textContent = '⏳ Submitting Kling Image...';
                     document.getElementById('image-result').classList.add('show');
 
                     const response = await fetch(`${API_BASE}/api/generate`, {
@@ -950,11 +950,11 @@
                     
                     const data = await response.json();
                     if (!(data.success && (data.jobId || data.taskId))) {
-                        throw new Error(data.error || 'Kling Image 提交失败');
+                        throw new Error(data.error || 'Kling Image submission failed');
                     }
 
                     document.getElementById('image-status').className = 'status pending';
-                    document.getElementById('image-status').textContent = `⏳ Kling Image 任务已提交：${data.jobId || data.taskId}，每 10 秒检查一次...`;
+                    document.getElementById('image-status').textContent = `⏳ Kling Image task submitted: ${data.jobId || data.taskId}, polling every 10s...`;
                     await pollKlingImageStatus(data.jobId || data.taskId);
                     return;
                 }
@@ -974,12 +974,12 @@
                 
                 if (data.success && data.images) {
                     document.getElementById('image-status').className = 'status success';
-                    document.getElementById('image-status').textContent = `✅ 生成成功！价格: ${data.price || '未知'}`;
+                    document.getElementById('image-status').textContent = `✅ Generation successful! Price: ${data.price || 'unknown'}`;
                     document.getElementById('image-output').src = data.images[0].url;
                     document.getElementById('image-result').classList.add('show');
                     saveToGallery('image', data.images[0].url, prompt, model);
                 } else {
-                    throw new Error(data.error || '生成失败');
+                    throw new Error(data.error || 'Generation failed');
                 }
             } catch (err) {
                 document.getElementById('image-status').className = 'status error';
@@ -998,15 +998,15 @@
 
                     if (data.status === 'completed') {
                         document.getElementById('image-status').className = 'status success';
-                        document.getElementById('image-status').textContent = `✅ Kling Image 完成！价格: ${data.price || '¥0.15'}`;
+                        document.getElementById('image-status').textContent = `✅ Kling Image complete! Price: ${data.price || '¥0.15'}`;
                         document.getElementById('image-output').src = data.imageUrl;
                         document.getElementById('image-result').classList.add('show');
                         saveToGallery('image', data.imageUrl, document.getElementById('image-prompt').value, 'kling-image-v2-1');
                     } else if (data.status === 'failure' || data.status === 'failed' || data.error) {
-                        throw new Error(data.message || data.error || 'Kling Image 生成失败');
+                        throw new Error(data.message || data.error || 'Kling Image generation failed');
                     } else {
                         document.getElementById('image-status').className = 'status pending';
-                        document.getElementById('image-status').textContent = `⏳ Kling Image 生成中（任务 ${taskId}），10 秒后继续检查...`;
+                        document.getElementById('image-status').textContent = `⏳ Kling Image generating (task ${taskId}), checking again in 10s...`;
                         setTimeout(checkStatus, 10000);
                     }
                 } catch (err) {
@@ -1029,13 +1029,13 @@
 
         async function handleMJAction(label) {
             if (!currentMJ.taskId) {
-                alert('没有可操作的 Midjourney 任务');
+                alert('No active Midjourney task');
                 return;
             }
 
             document.getElementById('image-loading').classList.add('show');
             document.getElementById('image-status').className = 'status pending';
-            document.getElementById('image-status').textContent = `⏳ 正在执行 ${label}...`;
+            document.getElementById('image-status').textContent = `⏳ Executing ${label}...`;
 
             try {
                 let payload;
@@ -1070,7 +1070,7 @@
                 const data = await response.json();
 
                 if (!(data.success && (data.jobId || data.taskId))) {
-                    throw new Error(data.error || `${label} 提交失败`);
+                    throw new Error(data.error || `${label} submission failed`);
                 }
 
                 currentMJ.taskId = data.jobId || data.taskId;
@@ -1091,7 +1091,7 @@
             const mask = document.getElementById('edit-mask').value;
 
             if (!imageUrl || !prompt) {
-                alert('请输入原图 URL 和编辑提示词');
+                alert('Please enter original image URL and edit prompt');
                 return;
             }
 
@@ -1116,11 +1116,11 @@
 
                 const data = await response.json();
                 if (!(data.success && (data.jobId || data.taskId))) {
-                    throw new Error(data.error || 'MJ 编辑提交失败');
+                    throw new Error(data.error || 'MJ edit submission failed');
                 }
 
                 document.getElementById('edit-status').className = 'status pending';
-                document.getElementById('edit-status').textContent = `⏳ MJ 编辑已提交：${data.jobId || data.taskId}，20秒检查一次...`;
+                document.getElementById('edit-status').textContent = `⏳ MJ edit submitted: ${data.jobId || data.taskId}, polling every 20s...`;
                 document.getElementById('edit-result').classList.add('show');
 
                 await pollMJEditStatus(data.jobId || data.taskId);
@@ -1141,14 +1141,14 @@
 
                     if (data.status === 'completed') {
                         document.getElementById('edit-status').className = 'status success';
-                        document.getElementById('edit-status').textContent = `✅ MJ 编辑完成！价格: ${data.price || '¥1.00'}`;
+                        document.getElementById('edit-status').textContent = `✅ MJ edit complete! Price: ${data.price || '¥1.00'}`;
                         document.getElementById('edit-output').src = data.imageUrl;
                         saveToGallery('image', data.imageUrl, document.getElementById('edit-prompt').value, 'mj-edits');
                     } else if (data.status === 'failure' || data.status === 'failed' || data.error) {
-                        throw new Error(data.message || data.error || 'MJ 编辑失败');
+                        throw new Error(data.message || data.error || 'MJ edit failed');
                     } else {
                         document.getElementById('edit-status').className = 'status pending';
-                        document.getElementById('edit-status').textContent = `⏳ MJ 编辑中（任务 ${taskId}），20秒后继续...`;
+                        document.getElementById('edit-status').textContent = `⏳ MJ editing (task ${taskId}), checking again in 20s...`;
                         setTimeout(checkStatus, 20000);
                     }
                 } catch (err) {
@@ -1173,7 +1173,7 @@
             const singleImageUrl = document.getElementById('nanobanana-image-url')?.value;
 
             if (!prompt) {
-                alert('请输入提示词');
+                alert('Please enter a prompt');
                 return;
             }
 
@@ -1181,7 +1181,7 @@
             document.getElementById('nanobanana-result').classList.remove('show');
 
             try {
-                // 统一使用 generate 端点，带参考图
+                // Use generate endpoint with reference images
                 const images = refImages.length > 0 ? refImages : (singleImageUrl ? [singleImageUrl] : []);
                 const payload = { mode: 'nano-banana-generate', prompt, aspect };
                 if (images.length > 0) payload.images = images;
@@ -1195,12 +1195,12 @@
 
                 if (data.success && data.images && data.images[0]) {
                     document.getElementById('nanobanana-status').className = 'status success';
-                    document.getElementById('nanobanana-status').textContent = `✅ NanoBanana 完成！价格: ${data.price || '¥2.00'}`;
+                    document.getElementById('nanobanana-status').textContent = `✅ NanoBanana complete! Price: ${data.price || '¥2.00'}`;
                     document.getElementById('nanobanana-output').src = data.images[0].url;
                     document.getElementById('nanobanana-result').classList.add('show');
                     saveToGallery('image', data.images[0].url, prompt, 'nano-banana-pro-4k');
                 } else {
-                    throw new Error(data.error || 'NanoBanana 失败');
+                    throw new Error(data.error || 'NanoBanana failed');
                 }
             } catch (err) {
                 document.getElementById('nanobanana-status').className = 'status error';
@@ -1219,15 +1219,15 @@
 
                     if (data.success && data.images && data.images[0]) {
                         document.getElementById('nanobanana-status').className = 'status success';
-                        document.getElementById('nanobanana-status').textContent = `✅ NanoBanana 完成！价格: ${data.price || '¥2.00'}`;
+                        document.getElementById('nanobanana-status').textContent = `✅ NanoBanana complete! Price: ${data.price || '¥2.00'}`;
                         document.getElementById('nanobanana-output').src = data.images[0].url;
                         document.getElementById('nanobanana-result').classList.add('show');
                         saveToGallery('image', data.images[0].url, document.getElementById('nanobanana-prompt').value, 'nano-banana-pro-4k');
                     } else if (data.status === 'failure' || data.status === 'failed' || data.error) {
-                        throw new Error(data.message || data.error || 'NanoBanana 失败');
+                        throw new Error(data.message || data.error || 'NanoBanana failed');
                     } else {
                         document.getElementById('nanobanana-status').className = 'status pending';
-                        document.getElementById('nanobanana-status').textContent = `⏳ NanoBanana 处理中（任务 ${taskId}），10秒后继续检查...`;
+                        document.getElementById('nanobanana-status').textContent = `⏳ NanoBanana processing (task ${taskId}), checking again in 10s...`;
                         setTimeout(checkStatus, 10000);
                     }
                 } catch (err) {
@@ -1245,7 +1245,7 @@
             const ratio = document.getElementById('video-ratio').value;
             
             if (!prompt) {
-                alert('请输入提示词');
+                alert('Please enter a prompt');
                 return;
             }
             
@@ -1269,13 +1269,13 @@
                 
                 if (data.success && data.jobId) {
                     document.getElementById('video-status').className = 'status pending';
-                    document.getElementById('video-status').textContent = `⏳ 任务已提交: ${data.jobId}，正在处理...`;
+                    document.getElementById('video-status').textContent = `⏳ Task submitted: ${data.jobId}, processing...`;
                     document.getElementById('video-result').classList.add('show');
-                    
-                    // 轮询状态
+
+                    // Polling status
                     pollVideoStatus(data.jobId, model);
                 } else {
-                    throw new Error(data.error || '提交失败');
+                    throw new Error(data.error || 'Submission failed');
                 }
             } catch (err) {
                 document.getElementById('video-status').className = 'status error';
@@ -1293,12 +1293,12 @@
                     
                     if (data.status === 'completed' || data.status === 'succeeded') {
                         document.getElementById('video-status').className = 'status success';
-                        document.getElementById('video-status').textContent = '✅ 视频生成完成！';
+                        document.getElementById('video-status').textContent = '✅ Video generation complete!';
                         document.getElementById('video-output').src = data.videoUrl;
                         document.getElementById('video-loading').classList.remove('show');
                         saveToGallery('video', data.videoUrl, document.getElementById('video-prompt').value, model);
                     } else if (data.status === 'failed' || data.status === 'error') {
-                        throw new Error(data.message || '生成失败');
+                        throw new Error(data.message || 'Generation failed');
                     } else {
                         setTimeout(checkStatus, 5000);
                     }
@@ -1329,7 +1329,7 @@
             const grid = document.getElementById('gallery-grid');
             
             if (gallery.length === 0) {
-                grid.innerHTML = '<p style="text-align:center;color:#888;">暂无作品</p>';
+                grid.innerHTML = '<p style="text-align:center;color:#888;">No works yet</p>';
                 return;
             }
             
@@ -1344,8 +1344,8 @@
                         <p>${item.prompt.slice(0, 50)}...</p>
                         <p>${new Date(item.time).toLocaleString()}</p>
                         ${item.type === 'image' ? `
-                            <button class="mj-btn" onclick="useForMJEdit('${item.url}')" style="margin-top:10px;width:100%;">✏️ 用作 MJ 编辑</button>
-                            <button class="mj-btn" onclick="openLightbox('${item.url}')" style="margin-top:5px;width:100%;">🔍 放大查看</button>
+                            <button class="mj-btn" onclick="useForMJEdit('${item.url}')" style="margin-top:10px;width:100%;">✏️ Use for MJ Edit</button>
+                            <button class="mj-btn" onclick="openLightbox('${item.url}')" style="margin-top:5px;width:100%;">🔍 View Full Size</button>
                         ` : ''}
                     </div>
                 </div>
@@ -1358,7 +1358,7 @@
             document.getElementById('edit-prompt').focus();
         }
 
-        // ==================== Kling Studio 功能 ====================
+        // ==================== Kling Studio Functions ====================
         let klingState = { taskId: null, resultUrl: null, resultType: null };
 
         function onKlingModeChange() {
@@ -1372,15 +1372,15 @@
             const durationSelect = document.getElementById('kling-duration');
             const cameraSelect = document.getElementById('kling-camera');
 
-            // 隐藏所有特定输入
+            // Hide all specific inputs
             mediaGroup.style.display = 'none';
             videoGroup.style.display = 'none';
             audioGroup.style.display = 'none';
 
-            // 根据模式显示对应输入
+            // Show inputs based on mode
             switch(mode) {
                 case 'video-t2v':
-                    promptLabel.textContent = '提示词 (Prompt)';
+                    promptLabel.textContent = 'Prompt';
                     modelSelect.innerHTML = `
                         <option value="kling-v2-6">Kling V2.6 <span class="price-tag">¥2.50</span></option>
                         <option value="kling-o1">Kling O1 <span class="price-tag">¥0.80</span></option>
@@ -1391,9 +1391,9 @@
                     cameraSelect.disabled = false;
                     break;
                 case 'video-i2v':
-                    promptLabel.textContent = '提示词 (Prompt)';
+                    promptLabel.textContent = 'Prompt';
                     mediaGroup.style.display = 'block';
-                    document.getElementById('kling-media-label').textContent = '图片 URL';
+                    document.getElementById('kling-media-label').textContent = 'Image URL';
                     modelSelect.innerHTML = `
                         <option value="kling-v2-6">Kling V2.6 <span class="price-tag">¥2.50</span></option>
                         <option value="kling-o1">Kling O1 <span class="price-tag">¥0.80</span></option>
@@ -1403,7 +1403,7 @@
                     cameraSelect.disabled = false;
                     break;
                 case 'image':
-                    promptLabel.textContent = '提示词 (Prompt)';
+                    promptLabel.textContent = 'Prompt';
                     modelSelect.innerHTML = `
                         <option value="kling-image-v2-1">Kling Image 2.1 <span class="price-tag">¥0.15</span></option>
                         <option value="kling-image-v2">Kling Image V2 <span class="price-tag">¥0.15</span></option>
@@ -1413,7 +1413,7 @@
                     cameraSelect.disabled = true;
                     break;
                 case 'video-to-audio':
-                    promptLabel.textContent = '音频描述 (可选)';
+                    promptLabel.textContent = 'Audio Description (optional)';
                     videoGroup.style.display = 'block';
                     modelSelect.innerHTML = `
                         <option value="kling-video-to-audio">Video-to-Audio <span class="price-tag">¥0.50</span></option>
@@ -1423,10 +1423,10 @@
                     cameraSelect.disabled = true;
                     break;
                 case 'lip-sync':
-                    promptLabel.textContent = '描述 (可选)';
+                    promptLabel.textContent = 'Description (optional)';
                     mediaGroup.style.display = 'block';
                     audioGroup.style.display = 'block';
-                    document.getElementById('kling-media-label').textContent = '人物图片或视频 URL';
+                    document.getElementById('kling-media-label').textContent = 'Character Image or Video URL';
                     modelSelect.innerHTML = `
                         <option value="kling-lip-sync">Lip Sync <span class="price-tag">¥1.00</span></option>
                     `;
@@ -1453,17 +1453,17 @@
             const videoUrl = document.getElementById('kling-video-url')?.value;
             const audioUrl = document.getElementById('kling-audio-url')?.value;
 
-            // 验证输入
+            // Validate inputs
             if (mode === 'video-to-audio' && !videoUrl) {
-                alert('请输入视频 URL');
+                alert('Please enter a video URL');
                 return;
             }
             if (mode === 'lip-sync' && !mediaUrl) {
-                alert('请输入图片或视频 URL');
+                alert('Please enter an image or video URL');
                 return;
             }
             if (mode === 'lip-sync' && !audioUrl) {
-                alert('请输入音频 URL');
+                alert('Please enter an audio URL');
                 return;
             }
 
@@ -1533,12 +1533,12 @@
 
                 if (data.success && (data.jobId || data.taskId)) {
                     document.getElementById('kling-status').className = 'status pending';
-                    document.getElementById('kling-status').textContent = `⏳ Kling 任务已提交: ${data.jobId || data.taskId}`;
+                    document.getElementById('kling-status').textContent = `⏳ Kling task submitted: ${data.jobId || data.taskId}`;
                     document.getElementById('kling-result').classList.add('show');
                     klingState.taskId = data.jobId || data.taskId;
                     await pollKlingStatus(data.jobId || data.taskId, model, mode);
                 } else {
-                    throw new Error(data.error || '提交失败');
+                    throw new Error(data.error || 'Submission failed');
                 }
             } catch (err) {
                 document.getElementById('kling-status').className = 'status error';
@@ -1562,7 +1562,7 @@
 
                     if (data.status === 'completed') {
                         document.getElementById('kling-status').className = 'status success';
-                        document.getElementById('kling-status').textContent = '✅ Kling 任务完成！';
+                        document.getElementById('kling-status').textContent = '✅ Kling task complete!';
 
                         const container = document.getElementById('kling-output-container');
                         const url = data.url || data.videoUrl || data.imageUrl || data.audioUrl;
@@ -1584,9 +1584,9 @@
                             document.getElementById('kling-follow-actions').style.display = 'flex';
                         }
                     } else if (data.status === 'failed' || data.status === 'error' || data.error) {
-                        throw new Error(data.message || data.error || '生成失败');
+                        throw new Error(data.message || data.error || 'Generation failed');
                     } else {
-                        document.getElementById('kling-status').textContent = `⏳ 生成中: ${taskId}`;
+                        document.getElementById('kling-status').textContent = `⏳ Generating: ${taskId}`;
                         setTimeout(checkStatus, 10000);
                     }
                 } catch (err) {
@@ -1599,7 +1599,7 @@
 
         function useKlingResultForAudio() {
             if (!klingState.resultUrl || klingState.resultType !== 'video') {
-                alert('没有可用的视频结果');
+                alert('No video result available');
                 return;
             }
             document.getElementById('kling-mode').value = 'video-to-audio';
@@ -1610,7 +1610,7 @@
 
         function useKlingResultForLipSync() {
             if (!klingState.resultUrl || klingState.resultType !== 'video') {
-                alert('没有可用的视频结果');
+                alert('No video result available');
                 return;
             }
             document.getElementById('kling-mode').value = 'lip-sync';
@@ -1620,12 +1620,12 @@
 
         function extendKlingVideo() {
             if (!klingState.resultUrl || klingState.resultType !== 'video') {
-                alert('没有可用的视频结果');
+                alert('No video result available');
                 return;
             }
 
             const model = document.getElementById('kling-model')?.value || 'kling-video-v2-6';
-            const prompt = prompt('输入延长描述（可选，留空使用原提示）：') || '';
+            const prompt = prompt('Enter extension description (optional, leave empty to use original prompt):') || '';
 
             const payload = {
                 mode: 'video-extend',
@@ -1635,11 +1635,11 @@
                 duration: 5,
             };
 
-            // 更新 UI 状态
+            // Update UI state
             klingState.currentJobId = null;
             klingState.resultUrl = null;
             klingState.resultType = null;
-            document.getElementById('kling-status').textContent = '⏳ 视频延长中...';
+            document.getElementById('kling-status').textContent = '⏳ Extending video...';
 
             fetch(`${API_BASE}/api/generate`, {
                 method: 'POST',
@@ -1651,10 +1651,10 @@
                 const jobId = data.jobId || data.taskId;
                 if (data.success && jobId) {
                     klingState.currentJobId = jobId;
-                    document.getElementById('kling-status').textContent = `⏳ 视频延长中：${jobId}`;
+                    document.getElementById('kling-status').textContent = `⏳ Extending video: ${jobId}`;
                     pollKlingStatus(jobId, model);
                 } else {
-                    throw new Error(data.error || '视频延长失败');
+                    throw new Error(data.error || 'Video extension failed');
                 }
             })
             .catch(err => {
@@ -1667,11 +1667,11 @@
             const items = gallery.filter(item => item.type === type);
 
             if (items.length === 0) {
-                alert(`作品库中没有${type === 'image' ? '图片' : '视频'}`);
+                alert(`No ${type === 'image' ? 'images' : 'videos'} in gallery`);
                 return;
             }
 
-            // 创建选择对话框
+            // Create selection dialog
             const modal = document.createElement('div');
             modal.style.cssText = `
                 position: fixed;
@@ -1687,7 +1687,7 @@
             `;
 
             const title = document.createElement('h3');
-            title.textContent = `选择${type === 'image' ? '图片' : '视频'}`;
+            title.textContent = `Select ${type === 'image' ? 'Image' : 'Video'}`;
             title.style.cssText = 'color: white; text-align: center; margin-bottom: 20px;';
             modal.appendChild(title);
 
@@ -1710,8 +1710,8 @@
                     transition: transform 0.2s;
                 `;
                 div.innerHTML = type === 'image'
-                    ? `<img src="${item.url}" style="width:100%;height:150px;object-fit:cover;border-radius:8px;"><p style="color:#aaa;font-size:12px;margin-top:8px;">${item.prompt?.slice(0, 30) || '无描述'}...</p>`
-                    : `<video src="${item.url}" style="width:100%;height:150px;object-fit:cover;border-radius:8px;"></video><p style="color:#aaa;font-size:12px;margin-top:8px;">${item.prompt?.slice(0, 30) || '无描述'}...</p>`;
+                    ? `<img src="${item.url}" style="width:100%;height:150px;object-fit:cover;border-radius:8px;"><p style="color:#aaa;font-size:12px;margin-top:8px;">${item.prompt?.slice(0, 30) || 'No description'}...</p>`
+                    : `<video src="${item.url}" style="width:100%;height:150px;object-fit:cover;border-radius:8px;"></video><p style="color:#aaa;font-size:12px;margin-top:8px;">${item.prompt?.slice(0, 30) || 'No description'}...</p>`;
                 div.onclick = () => {
                     document.getElementById(inputId).value = item.url;
                     document.body.removeChild(modal);
@@ -1724,7 +1724,7 @@
             modal.appendChild(grid);
 
             const closeBtn = document.createElement('button');
-            closeBtn.textContent = '关闭';
+            closeBtn.textContent = 'Close';
             closeBtn.style.cssText = `
                 margin-top: 20px;
                 padding: 10px 30px;
@@ -1741,7 +1741,7 @@
             document.body.appendChild(modal);
         }
 
-        // Lightbox 放大查看功能
+        // Lightbox fullscreen view
         function openLightbox(imageUrl) {
             const modal = document.createElement('div');
             modal.id = 'lightbox-modal';
@@ -1800,12 +1800,12 @@
             };
         }
 
-        // ==================== 参考图片管理（NanoBanana + MJ） ====================
+        // ==================== Reference Image Management (NanoBanana + MJ) ====================
         const refImageStates = { mjstudio: [], nanobanana: [] };
 
         function addRefImage(panel, source) {
             const state = refImageStates[panel];
-            if (state.length >= 4) { alert('最多 4 张参考图'); return; }
+            if (state.length >= 4) { alert('Maximum 4 reference images'); return; }
             if (source === 'file') { triggerFileUpload(panel); }
             else if (source === 'url') { promptImageUrl(panel); }
             else if (source === 'gallery') { loadFromGalleryForRef(panel); }
@@ -1829,7 +1829,7 @@
         }
 
         function promptImageUrl(panel) {
-            const url = prompt('输入图片 URL：');
+            const url = prompt('Enter image URL:');
             if (url && url.trim()) {
                 refImageStates[panel].push(url.trim());
                 renderRefImages(panel);
@@ -1839,11 +1839,11 @@
         function loadFromGalleryForRef(panel) {
             const gallery = JSON.parse(localStorage.getItem('gallery') || '[]');
             const items = gallery.filter(item => item.type === 'image');
-            if (items.length === 0) { alert('作品库没有图片'); return; }
+            if (items.length === 0) { alert('No images in gallery'); return; }
             const modal = document.createElement('div');
             modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:flex;flex-direction:column;z-index:9999;padding:20px;';
             const title = document.createElement('h3');
-            title.textContent = '选择参考图';
+            title.textContent = 'Select Reference Image';
             title.style.cssText = 'color:white;text-align:center;margin-bottom:20px;';
             modal.appendChild(title);
             const grid = document.createElement('div');
@@ -1857,7 +1857,7 @@
                         refImageStates[panel].push(item.url);
                         renderRefImages(panel);
                         document.body.removeChild(modal);
-                    } else { alert('最多 4 张'); }
+                    } else { alert('Maximum 4 images'); }
                 };
                 div.onmouseenter = () => div.style.transform = 'scale(1.02)';
                 div.onmouseleave = () => div.style.transform = 'scale(1)';
@@ -1865,7 +1865,7 @@
             });
             modal.appendChild(grid);
             const closeBtn = document.createElement('button');
-            closeBtn.textContent = '关闭';
+            closeBtn.textContent = 'Close';
             closeBtn.style.cssText = 'margin-top:20px;padding:10px 30px;background:rgba(255,255,255,0.2);border:none;border-radius:20px;color:white;cursor:pointer;align-self:center;';
             closeBtn.onclick = () => document.body.removeChild(modal);
             modal.appendChild(closeBtn);
