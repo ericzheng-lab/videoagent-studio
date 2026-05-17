@@ -111,7 +111,8 @@ function detectProvider(modelId) {
 
 // CORS helper
 function setCorsHeaders(res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  const origin = process.env.ALLOWED_ORIGIN || "*";
+  res.setHeader("Access-Control-Allow-Origin", origin);
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 }
@@ -198,6 +199,7 @@ module.exports = async function handler(req, res) {
 
       // Kling Studio
       case "kling-video-generate":
+      case "kling-video-extend":
         result = await klingStudioVideo(body, apiKey);
         break;
       case "kling-image-generate":

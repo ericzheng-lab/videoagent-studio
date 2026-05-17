@@ -119,12 +119,6 @@ async function generateCheapImage(params, apiKey) {
   }
 
   // 调试日志
-  console.log('[generateCheapImage] API Key present:', !!apiKey);
-  console.log('[generateCheapImage] API Key length:', apiKey ? apiKey.length : 0);
-  console.log('[generateCheapImage] Endpoint:', endpoint);
-  console.log('[generateCheapImage] Model:', imageModel);
-  console.log('[generateCheapImage] Body:', JSON.stringify(body));
-
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -134,8 +128,6 @@ async function generateCheapImage(params, apiKey) {
     body: JSON.stringify(body),
   });
 
-  console.log('[generateCheapImage] Response status:', response.status);
-
   if (!response.ok) {
     const error = await response.text();
     console.error('[generateCheapImage] Error response:', error);
@@ -143,8 +135,6 @@ async function generateCheapImage(params, apiKey) {
   }
 
   const data = await response.json();
-
-  console.log('[generateCheapImage] Response data:', JSON.stringify(data).slice(0, 500));
 
   // OpenAI 格式返回 (bltcy.ai 返回的是 base64 数据)
   if (data.data && data.data[0]) {
@@ -154,9 +144,7 @@ async function generateCheapImage(params, apiKey) {
     // 如果没有 URL，只有 base64，上传到阿里云 OSS
     if (!imageUrl && img.b64_json) {
       try {
-        console.log('[Image] Uploading base64 to OSS...');
         imageUrl = await uploadImage(img.b64_json, `flux-${Date.now()}.jpg`);
-        console.log('[Image] OSS URL:', imageUrl);
       } catch (e) {
         console.error('[Image] OSS upload failed:', e.message);
         // 失败时返回 base64 (Web UI 可以显示，Discord 不行)

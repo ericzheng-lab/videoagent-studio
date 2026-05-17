@@ -6,8 +6,8 @@ import uuid
 # ==========================================
 # 阿里云 OSS 配置信息
 # ==========================================
-ACCESS_KEY_ID = 'LTAI5tLxHjmUc4uuT5P1G92r'
-ACCESS_KEY_SECRET = '1E4cwzklYSnkaatu08UtTyOnl9E7gj'
+ACCESS_KEY_ID = os.environ.get('OSS_ACCESS_KEY_ID', '')
+ACCESS_KEY_SECRET = os.environ.get('OSS_ACCESS_KEY_SECRET', '')
 ENDPOINT = 'oss-cn-hangzhou.aliyuncs.com'
 BUCKET_NAME = 'drs-88'
 

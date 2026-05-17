@@ -770,11 +770,11 @@
                     body: JSON.stringify(payload)
                 });
                 const data = await response.json();
-                if (!(data.success && data.taskId)) throw new Error(data.error || 'Midjourney 提交失败');
-                
-                mjStudioState = { taskId: data.taskId, buttons: [], prompt, aspect, imageUrl: null, originalUrl: null, lastAction: 'imagine', lastButton: null };
-                document.getElementById('mjstudio-status').textContent = `⏳ Midjourney 任务已提交：${data.taskId}，每 20 秒检查一次...`;
-                await pollMJStudioStatus(data.taskId);
+                if (!(data.success && (data.jobId || data.taskId))) throw new Error(data.error || 'Midjourney 提交失败');
+
+                mjStudioState = { taskId: data.jobId || data.taskId, buttons: [], prompt, aspect, imageUrl: null, originalUrl: null, lastAction: 'imagine', lastButton: null };
+                document.getElementById('mjstudio-status').textContent = `⏳ Midjourney 任务已提交：${data.jobId || data.taskId}，每 20 秒检查一次...`;
+                await pollMJStudioStatus(data.jobId || data.taskId);
             } catch (err) {
                 document.getElementById('mjstudio-status').className = 'status error';
                 document.getElementById('mjstudio-status').textContent = '❌ ' + err.message;
@@ -843,12 +843,12 @@
                 }
                 const res = await fetch(`${API_BASE}/api/generate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 const data = await res.json();
-                if (!(data.success && data.taskId)) throw new Error(data.error || `${label} 提交失败`);
-                mjStudioState.taskId = data.taskId;
+                if (!(data.success && (data.jobId || data.taskId))) throw new Error(data.error || `${label} 提交失败`);
+                mjStudioState.taskId = data.jobId || data.taskId;
                 mjStudioState.buttons = [];
                 mjStudioState.lastAction = label === 'REROLL' ? 'reroll' : (label.startsWith('U') ? 'upscale' : 'variation');
                 mjStudioState.lastButton = label;
-                await pollMJStudioStatus(data.taskId);
+                await pollMJStudioStatus(data.jobId || data.taskId);
             } catch (err) {
                 document.getElementById('mjstudio-status').className = 'status error';
                 document.getElementById('mjstudio-status').textContent = '❌ ' + err.message;
@@ -912,12 +912,12 @@
                     });
                     
                     const data = await response.json();
-                    if (!(data.success && data.taskId)) {
+                    if (!(data.success && (data.jobId || data.taskId))) {
                         throw new Error(data.error || 'Midjourney 提交失败');
                     }
 
                     currentMJ = {
-                        taskId: data.taskId,
+                        taskId: data.jobId || data.taskId,
                         buttons: [],
                         prompt,
                         aspect: size === '1024x1536' ? '2:3' : size === '1536x1024' ? '3:2' : '1:1',
@@ -926,8 +926,8 @@
                     };
 
                     document.getElementById('image-status').className = 'status pending';
-                    document.getElementById('image-status').textContent = `⏳ Midjourney 任务已提交：${data.taskId}，每 20 秒检查一次...`;
-                    await pollMJStatus(data.taskId);
+                    document.getElementById('image-status').textContent = `⏳ Midjourney 任务已提交：${data.jobId || data.taskId}，每 20 秒检查一次...`;
+                    await pollMJStatus(data.jobId || data.taskId);
                     return;
                 }
 
@@ -949,13 +949,13 @@
                     });
                     
                     const data = await response.json();
-                    if (!(data.success && data.taskId)) {
+                    if (!(data.success && (data.jobId || data.taskId))) {
                         throw new Error(data.error || 'Kling Image 提交失败');
                     }
 
                     document.getElementById('image-status').className = 'status pending';
-                    document.getElementById('image-status').textContent = `⏳ Kling Image 任务已提交：${data.taskId}，每 10 秒检查一次...`;
-                    await pollKlingImageStatus(data.taskId);
+                    document.getElementById('image-status').textContent = `⏳ Kling Image 任务已提交：${data.jobId || data.taskId}，每 10 秒检查一次...`;
+                    await pollKlingImageStatus(data.jobId || data.taskId);
                     return;
                 }
 
@@ -1069,13 +1069,13 @@
                 });
                 const data = await response.json();
 
-                if (!(data.success && data.taskId)) {
+                if (!(data.success && (data.jobId || data.taskId))) {
                     throw new Error(data.error || `${label} 提交失败`);
                 }
 
-                currentMJ.taskId = data.taskId;
+                currentMJ.taskId = data.jobId || data.taskId;
                 currentMJ.buttons = [];
-                await pollMJStatus(data.taskId);
+                await pollMJStatus(data.jobId || data.taskId);
             } catch (err) {
                 document.getElementById('image-status').className = 'status error';
                 document.getElementById('image-status').textContent = '❌ ' + err.message;
@@ -1115,15 +1115,15 @@
                 });
 
                 const data = await response.json();
-                if (!(data.success && data.taskId)) {
+                if (!(data.success && (data.jobId || data.taskId))) {
                     throw new Error(data.error || 'MJ 编辑提交失败');
                 }
 
                 document.getElementById('edit-status').className = 'status pending';
-                document.getElementById('edit-status').textContent = `⏳ MJ 编辑已提交：${data.taskId}，20秒检查一次...`;
+                document.getElementById('edit-status').textContent = `⏳ MJ 编辑已提交：${data.jobId || data.taskId}，20秒检查一次...`;
                 document.getElementById('edit-result').classList.add('show');
 
-                await pollMJEditStatus(data.taskId);
+                await pollMJEditStatus(data.jobId || data.taskId);
             } catch (err) {
                 document.getElementById('edit-status').className = 'status error';
                 document.getElementById('edit-status').textContent = '❌ ' + err.message;
@@ -1531,12 +1531,12 @@
 
                 const data = await response.json();
 
-                if (data.success && data.taskId) {
+                if (data.success && (data.jobId || data.taskId)) {
                     document.getElementById('kling-status').className = 'status pending';
-                    document.getElementById('kling-status').textContent = `⏳ Kling 任务已提交: ${data.taskId}`;
+                    document.getElementById('kling-status').textContent = `⏳ Kling 任务已提交: ${data.jobId || data.taskId}`;
                     document.getElementById('kling-result').classList.add('show');
-                    klingState.taskId = data.taskId;
-                    await pollKlingStatus(data.taskId, model, mode);
+                    klingState.taskId = data.jobId || data.taskId;
+                    await pollKlingStatus(data.jobId || data.taskId, model, mode);
                 } else {
                     throw new Error(data.error || '提交失败');
                 }
@@ -1623,7 +1623,43 @@
                 alert('没有可用的视频结果');
                 return;
             }
-            alert('视频延长功能开发中...');
+
+            const model = document.getElementById('kling-model')?.value || 'kling-video-v2-6';
+            const prompt = prompt('输入延长描述（可选，留空使用原提示）：') || '';
+
+            const payload = {
+                mode: 'video-extend',
+                model: model,
+                prompt: prompt || 'Extend the video',
+                videoUrl: klingState.resultUrl,
+                duration: 5,
+            };
+
+            // 更新 UI 状态
+            klingState.currentJobId = null;
+            klingState.resultUrl = null;
+            klingState.resultType = null;
+            document.getElementById('kling-status').textContent = '⏳ 视频延长中...';
+
+            fetch(`${API_BASE}/api/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            })
+            .then(res => res.json())
+            .then(data => {
+                const jobId = data.jobId || data.taskId;
+                if (data.success && jobId) {
+                    klingState.currentJobId = jobId;
+                    document.getElementById('kling-status').textContent = `⏳ 视频延长中：${jobId}`;
+                    pollKlingStatus(jobId, model);
+                } else {
+                    throw new Error(data.error || '视频延长失败');
+                }
+            })
+            .catch(err => {
+                document.getElementById('kling-status').textContent = `❌ ${err.message}`;
+            });
         }
 
         function loadFromGallery(inputId, type) {

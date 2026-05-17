@@ -52,8 +52,6 @@ async function uploadToOSS(base64Data, filename) {
   const folderPrefix = isMJ ? 'mj-images' : 'videoagent-images';
   const objectName = `${folderPrefix}/${datePrefix}/${uniqueId}_${filename}`;
   
-  console.log(`[OSS] Uploading ${filename} (${buffer.length} bytes)...`);
-  
   try {
     // 上传到 OSS
     const result = await client.put(objectName, buffer);
@@ -61,7 +59,6 @@ async function uploadToOSS(base64Data, filename) {
     // 生成公共访问 URL
     const publicUrl = `https://${OSS_CONFIG.bucket}.${OSS_CONFIG.endpoint}/${objectName}`;
     
-    console.log(`[OSS] Upload successful: ${publicUrl}`);
     return publicUrl;
     
   } catch (error) {

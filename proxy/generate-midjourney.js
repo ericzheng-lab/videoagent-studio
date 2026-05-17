@@ -36,7 +36,6 @@ async function mjImagine(params, apiKey) {
       } else {
         // URL，下载转 base64
         try {
-          console.log('[MJ] Downloading reference image:', img);
           const imgRes = await fetch(img);
           const imgBuf = await imgRes.arrayBuffer();
           const b64 = Buffer.from(imgBuf).toString('base64');
@@ -85,12 +84,10 @@ async function mjImagine(params, apiKey) {
   // 上传到 OSS
   if (result.success && result.imageUrl) {
     try {
-      console.log('[MJ] Downloading image from Discord...');
       const imageResponse = await fetch(result.imageUrl);
       const imageBuffer = await imageResponse.arrayBuffer();
       const base64Data = Buffer.from(imageBuffer).toString('base64');
-      
-      console.log('[MJ] Uploading to OSS...');
+
       const ossUrl = await uploadImage(base64Data, `mj-${Date.now()}.png`);
       
       return {

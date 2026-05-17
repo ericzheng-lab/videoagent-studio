@@ -74,8 +74,6 @@ async function generateKlingImage(params, apiKey) {
     body.negative_prompt = negativePrompt;
   }
 
-  console.log('[Kling Image] Request:', endpoint, JSON.stringify(body));
-
   // 调用 Kling Image API
   const response = await fetch(endpoint, {
     method: "POST",
@@ -93,7 +91,6 @@ async function generateKlingImage(params, apiKey) {
   }
 
   const data = await response.json();
-  console.log('[Kling Image] Response:', JSON.stringify(data).slice(0, 500));
 
   // Kling Image 返回异步任务
   if (data.code === 0 && data.data && data.data.task_id) {
@@ -131,7 +128,6 @@ async function checkKlingImageStatus(taskId, apiKey) {
   }
 
   const data = await response.json();
-  console.log('[Kling Image Status]:', JSON.stringify(data).slice(0, 500));
 
   const status = data.data?.task_status || data.status;
 

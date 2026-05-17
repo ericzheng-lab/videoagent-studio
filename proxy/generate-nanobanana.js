@@ -27,8 +27,6 @@ async function nanoBananaGenerate(params, apiKey) {
     body.image = images.slice(0, 4);
   }
 
-  console.log('[NanoBanana] Request:', endpoint, JSON.stringify(body));
-
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -44,7 +42,6 @@ async function nanoBananaGenerate(params, apiKey) {
   }
 
   const data = await response.json();
-  console.log('[NanoBanana] Response:', JSON.stringify(data).slice(0, 1000));
 
   // 提取图片 URL 或 base64
   let imageUrl = data.url || data.imageUrl || data.image_url;
@@ -109,22 +106,84 @@ async function nanoBananaGenerate(params, apiKey) {
 
 /**
  * NanoBanana Edit - 图生图 (同步返回)
- * 注意：edits 端点需要 multipart/form-data，这里简化处理
+ * 使用 /v1/images/edits 端点 + multipart/form-data
  */
 async function nanoBananaEdit(params, apiKey) {
   const { prompt, image, aspect = "1:1" } = params;
 
-  // 暂时使用 generations 端点，通过 prompt 描述编辑需求
-  // 真正的 edits 端点需要 multipart/form-data 和文件上传
-  console.log('[NanoBanana Edit] Using generate endpoint with image reference');
-  
-  // 构建一个包含原图描述的 prompt
-  const enhancedPrompt = `Based on reference image: ${image}. ${prompt}`;
-  
-  return nanoBananaGenerate({
-    prompt: enhancedPrompt,
-    aspect,
-  }, apiKey);
+  if (!image) {
+    throw new Error("Missing image for NanoBanana edit");
+  }
+
+  const endpoint = `${MJ_BASE_URL}/v1/images/edits`;
+
+  // 下载图片并构建 FormData
+  let imageBlob;
+  let filename = "edit-image.png";
+
+  if (image.startsWith("data:")) {
+    // base64 data URL
+    const match = image.match(/^data:(.*?);base64,(.*)$/);
+    if (!match) throw new Error("Invalid base64 image format");
+    const mime = match[1];
+    const b64 = match[2];
+    const binary = atob(b64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    imageBlob = new Blob([bytes], { type: mime });
+    filename = `edit-image.${mime.split("/")[1] || "png"}`;
+  } else if (image.startsWith("http")) {
+    // URL — 下载图片
+    const imgRes = await fetch(image);
+    if (!imgRes.ok) throw new Error(`Failed to download image: ${imgRes.status}`);
+    const arrayBuf = await imgRes.arrayBuffer();
+    imageBlob = new Blob([arrayBuf], { type: "image/png" });
+  } else {
+    throw new Error("Invalid image format: must be data URL or http(s) URL");
+  }
+
+  const formData = new FormData();
+  formData.append("prompt", prompt);
+  formData.append("image", imageBlob, filename);
+  formData.append("model", "nano-banana-pro");
+  formData.append("aspect_ratio", aspect);
+
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`HTTP ${response.status}: ${errorText}`);
+  }
+
+  const data = await response.json();
+
+  // 提取图片 URL
+  let imageUrl = data.url || data.imageUrl || data.image_url;
+
+  if (!imageUrl && data.data && data.data[0]) {
+    imageUrl = data.data[0].url;
+  }
+
+  if (!imageUrl && data.result) {
+    imageUrl = typeof data.result === "string" ? data.result : data.result.url;
+  }
+
+  if (imageUrl) {
+    return {
+      success: true,
+      images: [{ url: imageUrl }],
+      price: "¥2.00",
+      model: "nano-banana-pro-4k",
+    };
+  }
+
+  throw new Error(`No image in edit response: ${JSON.stringify(data).slice(0, 200)}`);
 }
 
 module.exports = {

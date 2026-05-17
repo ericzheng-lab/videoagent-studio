@@ -33,8 +33,6 @@ async function mjEdits(params, apiKey) {
     ...(maskBase64 && { maskBase64 }),
   };
 
-  console.log('[MJ Edits] Submitting edit task:', { prompt: body.prompt, image: body.image });
-
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -45,7 +43,6 @@ async function mjEdits(params, apiKey) {
   });
 
   const data = await response.json();
-  console.log('[MJ Edits] API response:', data);
 
   if (data.code !== 1) {
     throw new Error(`MJ Edits failed: ${data.description || JSON.stringify(data)}`);
@@ -64,8 +61,7 @@ async function mjEdits(params, apiKey) {
 
   // 等待完成
   const result = await waitForMJTask(taskId, apiKey);
-  console.log('[MJ Edits] Task result:', result);
-  
+
   // 检查 action 字段
   if (result.action && result.action !== 'EDITS') {
     console.warn(`[MJ Edits] Warning: Expected action 'EDITS' but got '${result.action}'`);
@@ -74,12 +70,10 @@ async function mjEdits(params, apiKey) {
   // 上传到 OSS
   if (result.success && result.imageUrl) {
     try {
-      console.log('[MJ Edits] Downloading image from Discord...');
       const imageResponse = await fetch(result.imageUrl);
       const imageBuffer = await imageResponse.arrayBuffer();
       const base64Data = Buffer.from(imageBuffer).toString('base64');
-      
-      console.log('[MJ Edits] Uploading to OSS...');
+
       const ossUrl = await uploadImage(base64Data, `mj-edit-${Date.now()}.png`);
       
       return {

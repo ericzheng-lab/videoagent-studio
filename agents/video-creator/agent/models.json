@@ -2,7 +2,7 @@
   "providers": {
     "gpt-agent": {
       "baseUrl": "https://gpt-agent.cc/v1",
-      "apiKey": "sk-nrzn3BklQq52gemUnVizNQ3JDGjWu10vQTW0uQmMJO3zgHNx",
+      "apiKey": "YOUR_GPT_AGENT_API_KEY",
       "api": "anthropic-messages",
       "models": [
         {
@@ -26,7 +26,7 @@
     },
     "gptagent-2": {
       "baseUrl": "https://gpt-agent.cc/v1",
-      "apiKey": "sk-nrzn3BklQq52gemUnVizNQ3JDGjWu10vQTW0uQmMJO3zgHNx",
+      "apiKey": "YOUR_GPT_AGENT_API_KEY",
       "api": "anthropic-messages",
       "models": [
         {
@@ -50,7 +50,7 @@
     },
     "gpt-agent-3": {
       "baseUrl": "https://gpt-agent.cc/v1",
-      "apiKey": "sk-nrzn3BklQq52gemUnVizNQ3JDGjWu10vQTW0uQmMJO3zgHNx",
+      "apiKey": "YOUR_GPT_AGENT_API_KEY",
       "api": "anthropic-messages",
       "models": [
         {
@@ -74,7 +74,7 @@
     },
     "gpt-agent-4": {
       "baseUrl": "https://gpt-agent.cc/v1",
-      "apiKey": "sk-nrzn3BklQq52gemUnVizNQ3JDGjWu10vQTW0uQmMJO3zgHNx",
+      "apiKey": "YOUR_GPT_AGENT_API_KEY",
       "api": "anthropic-messages",
       "models": [
         {
@@ -98,7 +98,7 @@
     },
     "gpt-agent-claude": {
       "baseUrl": "https://gpt-agent.cc/v1",
-      "apiKey": "sk-nrzn3BklQq52gemUnVizNQ3JDGjWu10vQTW0uQmMJO3zgHNx",
+      "apiKey": "YOUR_GPT_AGENT_API_KEY",
       "api": "anthropic-messages",
       "models": [
         {
@@ -122,7 +122,7 @@
     },
     "gpt-agent-5": {
       "baseUrl": "https://gpt-agent.cc/v1",
-      "apiKey": "sk-nrzn3BklQq52gemUnVizNQ3JDGjWu10vQTW0uQmMJO3zgHNx",
+      "apiKey": "YOUR_GPT_AGENT_API_KEY",
       "api": "anthropic-messages",
       "models": [
         {
@@ -146,7 +146,7 @@
     },
     "gpt-5-4": {
       "baseUrl": "https://gpt-agent.cc/v1",
-      "apiKey": "sk-nrzn3BklQq52gemUnVizNQ3JDGjWu10vQTW0uQmMJO3zgHNx",
+      "apiKey": "YOUR_GPT_AGENT_API_KEY",
       "api": "anthropic-messages",
       "models": [
         {
@@ -211,7 +211,7 @@
     },
     "gemini3f": {
       "baseUrl": "https://gpt-agent.cc/v1",
-      "apiKey": "sk-nrzn3BklQq52gemUnVizNQ3JDGjWu10vQTW0uQmMJO3zgHNx",
+      "apiKey": "YOUR_GPT_AGENT_API_KEY",
       "api": "anthropic-messages",
       "models": [
         {
@@ -235,7 +235,7 @@
     },
     "qw3-5": {
       "baseUrl": "https://gpt-agent.cc/v1",
-      "apiKey": "sk-nrzn3BklQq52gemUnVizNQ3JDGjWu10vQTW0uQmMJO3zgHNx",
+      "apiKey": "YOUR_GPT_AGENT_API_KEY",
       "api": "anthropic-messages",
       "models": [
         {
@@ -259,7 +259,7 @@
     },
     "minim": {
       "baseUrl": "https://gpt-agent.cc/v1",
-      "apiKey": "sk-nrzn3BklQq52gemUnVizNQ3JDGjWu10vQTW0uQmMJO3zgHNx",
+      "apiKey": "YOUR_GPT_AGENT_API_KEY",
       "api": "anthropic-messages",
       "models": [
         {
@@ -283,7 +283,7 @@
     },
     "mimopro": {
       "baseUrl": "https://gpt-agent.cc/v1",
-      "apiKey": "sk-nrzn3BklQq52gemUnVizNQ3JDGjWu10vQTW0uQmMJO3zgHNx",
+      "apiKey": "YOUR_GPT_AGENT_API_KEY",
       "api": "anthropic-messages",
       "models": [
         {
@@ -307,7 +307,7 @@
     },
     "qwen3-6": {
       "baseUrl": "https://gpt-agent.cc/v1",
-      "apiKey": "sk-nrzn3BklQq52gemUnVizNQ3JDGjWu10vQTW0uQmMJO3zgHNx",
+      "apiKey": "YOUR_GPT_AGENT_API_KEY",
       "api": "anthropic-messages",
       "models": [
         {

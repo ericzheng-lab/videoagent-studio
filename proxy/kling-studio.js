@@ -112,8 +112,6 @@ async function generateKlingVideo(params, apiKey) {
   if (motion_transfer) body.motion_transfer = motion_transfer;
   if (character_consistency) body.character_consistency = character_consistency;
 
-  console.log('[Kling Video] Request:', endpoint, JSON.stringify(body).slice(0, 200));
-
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -130,7 +128,7 @@ async function generateKlingVideo(params, apiKey) {
       success: true,
       mode,
       model: klingModel,
-      taskId: data.data.task_id,
+      jobId: data.data.task_id,
       status: data.data.task_status || "pending",
       message: "Video generation started.",
     };
@@ -177,8 +175,6 @@ async function generateKlingImage(params, apiKey) {
   if (seed !== undefined) body.seed = seed;
   if (negativePrompt) body.negative_prompt = negativePrompt;
 
-  console.log('[Kling Image] Request:', endpoint, JSON.stringify(body).slice(0, 200));
-
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -194,7 +190,7 @@ async function generateKlingImage(params, apiKey) {
     return {
       success: true,
       model: klingModel,
-      taskId: data.data.task_id,
+      jobId: data.data.task_id,
       status: data.data.task_status || "pending",
       message: "Image generation started.",
     };
@@ -229,8 +225,6 @@ async function generateKlingVideoToAudio(params, apiKey) {
     prompt: prompt,
   };
 
-  console.log('[Kling Video-to-Audio] Request:', endpoint, JSON.stringify(body).slice(0, 200));
-
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -246,7 +240,7 @@ async function generateKlingVideoToAudio(params, apiKey) {
     return {
       success: true,
       model: klingModel,
-      taskId: data.data.task_id,
+      jobId: data.data.task_id,
       status: data.data.task_status || "pending",
       message: "Video-to-audio generation started.",
     };
@@ -287,8 +281,6 @@ async function generateKlingLipSync(params, apiKey) {
   if (imageUrl) body.image_url = imageUrl;
   if (videoUrl) body.video_url = videoUrl;
 
-  console.log('[Kling Lip-Sync] Request:', endpoint, JSON.stringify(body).slice(0, 200));
-
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -304,7 +296,7 @@ async function generateKlingLipSync(params, apiKey) {
     return {
       success: true,
       model: klingModel,
-      taskId: data.data.task_id,
+      jobId: data.data.task_id,
       status: data.data.task_status || "pending",
       message: "Lip-sync generation started.",
     };

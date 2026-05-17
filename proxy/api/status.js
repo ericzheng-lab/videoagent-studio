@@ -16,12 +16,20 @@ function json(res, status, data) {
   res.status(status).json(data);
 }
 
+function setCorsHeaders(res) {
+  const origin = process.env.ALLOWED_ORIGIN || "*";
+  res.setHeader("Access-Control-Allow-Origin", origin);
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+}
+
 function getBearerToken(req) {
   const h = req.headers.authorization;
   return h && h.startsWith("Bearer ") ? h.slice(7).trim() : null;
 }
 
 module.exports = async function handler(req, res) {
+  setCorsHeaders(res);
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "GET") return json(res, 405, { error: "Method not allowed" });
 
@@ -67,28 +75,29 @@ module.exports = async function handler(req, res) {
     } else if (model.includes("wan")) {
       result = await checkCheapVideoStatus(jobId, model, apiKey);
     } else {
-      // 尝试所有适配器
-      try {
-        result = await checkKlingStatus(jobId, apiKey);
-      } catch {
+      // 尝试所有适配器，记录每次尝试
+      const adapters = [
+        { name: "kling", fn: () => checkKlingStatus(jobId, apiKey) },
+        { name: "runway", fn: () => checkRunwayStatus(jobId, apiKey) },
+        { name: "midjourney", fn: async () => {
+          const r = await checkMJStatus(jobId, apiKey);
+          if (r?.success && r.status === "completed") r.price = "¥1.00";
+          return r;
+        }},
+        { name: "nano-banana", fn: async () => {
+          const r = await checkNanoBananaStatus(jobId, apiKey);
+          if (r?.success && r.status === "completed") r.price = "¥2.00";
+          return r;
+        }},
+        { name: "wan", fn: () => checkCheapVideoStatus(jobId, model, apiKey) },
+      ];
+
+      for (const adapter of adapters) {
         try {
-          result = await checkRunwayStatus(jobId, apiKey);
-        } catch {
-          try {
-            result = await checkMJStatus(jobId, apiKey);
-            if (result && result.success && result.status === "completed") {
-              result.price = "¥1.00";
-            }
-          } catch {
-            try {
-              result = await checkNanoBananaStatus(jobId, apiKey);
-              if (result && result.success && result.status === "completed") {
-                result.price = "¥2.00";
-              }
-            } catch {
-              result = await checkCheapVideoStatus(jobId, model, apiKey);
-            }
-          }
+          result = await adapter.fn();
+          break;
+        } catch (e) {
+          console.error(`[Status] ${adapter.name} failed: ${e.message}`);
         }
       }
     }
